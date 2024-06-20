@@ -14,35 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneDatas_byGuid:
     keys:
-    - 9fc0d4010bbf28b4594072e72b8655ab
+    - 
     values:
     - goDatas_byGlobalId:
         keys:
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-798966693-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1360648712-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1710457293-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-963194225-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-2087795561-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1296919305-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-904650601-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1648788276-0
-        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1295758785-0
+        - globalObjectIdString: GlobalObjectId_V1-2-00000000000000000000000000000000-2007343187-0
+        - globalObjectIdString: GlobalObjectId_V1-2-00000000000000000000000000000000-963194225-0
         values:
-        - colorIndex: 3
-          iconNameOrGuid: 
         - colorIndex: 2
           iconNameOrGuid: 
         - colorIndex: 2
-          iconNameOrGuid: 
-        - colorIndex: 2
-          iconNameOrGuid: Camera Icon
-        - colorIndex: 0
-          iconNameOrGuid: PreMatCylinder
-        - colorIndex: 0
-          iconNameOrGuid: StandaloneInputModule Icon
-        - colorIndex: 0
-          iconNameOrGuid: MeshCollider Icon
-        - colorIndex: 8
-          iconNameOrGuid: Favorite
-        - colorIndex: 8
           iconNameOrGuid: 
