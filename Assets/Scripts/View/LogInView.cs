@@ -6,10 +6,11 @@ using UnityEngine.UI;
 
 public class LogInView : MonoBehaviour
 {
-    public TMP_InputField usernameField;
-    public TMP_InputField passwordField;
-    public Button loginButton;
-    public TextMeshProUGUI feedbackText;
+    [SerializeField] Button loginButton;
+
+    [SerializeField] TMP_InputField usernameField;
+    [SerializeField] TMP_InputField passwordField;
+    [SerializeField] TextMeshProUGUI feedbackText;
 
     private void Awake()
     {
@@ -42,110 +43,8 @@ public class LogInView : MonoBehaviour
             feedbackText.text = "Please enter both username and password.";
             return;
         }
-
-        StartCoroutine(Login(username, password));
-    }
-    IEnumerator Login(string username, string password)
-    {
-        string url = "http://localhost:3000/login";
-        WWWForm form = new WWWForm();
-        form.AddField("username", username);
-        form.AddField("password", password);
-
-        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
-        {
-            yield return www.SendWebRequest();
-
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-            {
-                feedbackText.text = "Error: " + www.error;
-            }
-            else
-            {
-                ProcessLoginResponse(www.downloadHandler.text);
-            }
-        }
-    }
-
-    void ProcessLoginResponse(string response)
-    {
-        LoginResponse loginResponse = JsonUtility.FromJson<LoginResponse>(response);
-
-        if (loginResponse.success)
-        {
-            feedbackText.text = "Login successful!";
-            
-            StartCoroutine(GetOrCreateUserDetails(loginResponse.userDetails.USER_ID));
-            for (int i = 0; i < 4; i++)
-            {
-                transform.GetChild(i).gameObject.SetActive(false);
-            }
-        }
         else
-        {
-            feedbackText.text = "Login failed: " + loginResponse.message;
-        }
-    }
-
-    IEnumerator GetOrCreateUserDetails(int userId)
-    {
-        string url = "http://localhost:3000/createUserDetails";
-        WWWForm form = new WWWForm();
-        form.AddField("userId", userId);
-
-        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
-        {
-            yield return www.SendWebRequest();
-
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-            {
-                feedbackText.text = "Error: " + www.error;
-            }
-            else
-            {
-                ProcessUserDetailsResponse(www.downloadHandler.text);
-            }
-        }
-    }
-
-    void ProcessUserDetailsResponse(string response)
-    {
-        UserDetailsResponse userDetailsResponse = JsonUtility.FromJson<UserDetailsResponse>(response);
-
-        if (userDetailsResponse.success)
-        {
-            feedbackText.text = "User details retrieved successfully!";
-            // 여기서 userDetailsResponse.userDetails를 사용하여 유저 정보를 처리
-        }
-        else
-        {
-            feedbackText.text = "Failed to retrieve user details: " + userDetailsResponse.message;
-        }
+            feedbackText.text = DataBaseManager.Inst.RequestLogin(username, password);
     }
 }
 
-[System.Serializable]
-public class LoginResponse
-{
-    public bool success;
-    public string message;
-    public UserDetails userDetails;
-}
-
-[System.Serializable]
-public class UserDetailsResponse
-{
-    public bool success;
-    public string message;
-    public UserDetails userDetails;
-}
-
-[System.Serializable]
-public class UserDetails
-{
-    public int USER_ID;
-    public string NICKNAME;
-    public int LEVEL;
-    public int EXPERIENCE;
-    public string INVENTORY;
-}
