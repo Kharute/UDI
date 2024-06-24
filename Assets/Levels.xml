@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Levels>
+  <dataCategory>
+    <data LEVEL="1" REQEXP="10" ATK="10" DEF="8" SPD="5" />
+    <data LEVEL="2" REQEXP="15" ATK="12" DEF="9" SPD="6" />
+    <data LEVEL="3" REQEXP="20" ATK="14" DEF="10" SPD="7" />
+    <data LEVEL="4" REQEXP="25" ATK="16" DEF="11" SPD="8" />
+    <data LEVEL="5" REQEXP="30" ATK="18" DEF="12" SPD="9" />
+    <data LEVEL="6" REQEXP="35" ATK="20" DEF="13" SPD="10" />
+    <data LEVEL="7" REQEXP="40" ATK="22" DEF="14" SPD="11" />
+    <data LEVEL="8" REQEXP="45" ATK="24" DEF="15" SPD="12" />
+    <data LEVEL="9" REQEXP="50" ATK="26" DEF="16" SPD="13" />
+    <data LEVEL="10" REQEXP="55" ATK="28" DEF="17" SPD="14" />
+    <data LEVEL="11" REQEXP="60" ATK="30" DEF="18" SPD="15" />
+    <data LEVEL="12" REQEXP="65" ATK="32" DEF="19" SPD="16" />
+    <data LEVEL="13" REQEXP="70" ATK="34" DEF="20" SPD="17" />
+    <data LEVEL="14" REQEXP="75" ATK="36" DEF="21" SPD="18" />
+    <data LEVEL="15" REQEXP="80" ATK="38" DEF="22" SPD="19" />
+    <data LEVEL="16" REQEXP="85" ATK="40" DEF="23" SPD="20" />
+    <data LEVEL="17" REQEXP="90" ATK="42" DEF="24" SPD="21" />
+    <data LEVEL="18" REQEXP="95" ATK="44" DEF="25" SPD="22" />
+    <data LEVEL="19" REQEXP="100" ATK="46" DEF="26" SPD="23" />
+    <data LEVEL="20" REQEXP="105" ATK="48" DEF="27" SPD="24" />
+  </dataCategory>
+</Levels>

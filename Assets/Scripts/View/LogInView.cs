@@ -44,7 +44,10 @@ public class LogInView : MonoBehaviour
             return;
         }
         else
+        {
             feedbackText.text = DataBaseManager.Inst.RequestLogin(username, password);
+            gameObject.SetActive(false); // 상황에 맞게 조절해야 함.
+        }
     }
 }
 

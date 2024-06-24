@@ -13,7 +13,6 @@ public class InventoryObject : ScriptableObject
     public ItemDatabaseObject database;
     public Inventory Container;
 
-
     public void AddItem(Item _item, int _amount)
     {
         if (_item.buffs.Length > 0)
@@ -71,7 +70,7 @@ public class InventoryObject : ScriptableObject
     {
         string saveData = JsonUtility.ToJson(this, true);
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(string.Concat(Application.persistentDataPath, savePath));
+        FileStream file = File.Create(string.Concat(Application.dataPath, savePath));
         bf.Serialize(file, saveData);
         file.Close();
 
@@ -80,13 +79,14 @@ public class InventoryObject : ScriptableObject
         formatter.Serialize(stream, Container);
         stream.Close();*/
     }
+
     [ContextMenu("Load")]
     public void Load()
     {
-        if (File.Exists(string.Concat(Application.persistentDataPath, savePath)))
+        if (File.Exists(string.Concat(Application.dataPath, savePath)))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(string.Concat(Application.persistentDataPath, savePath), FileMode.Open);
+            FileStream file = File.Open(string.Concat(Application.dataPath, savePath), FileMode.Open);
             JsonUtility.FromJsonOverwrite(bf.Deserialize(file).ToString(), this);
             file.Close();
 

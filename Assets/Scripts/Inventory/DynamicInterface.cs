@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class DynamicInterface : UserInterface
 {
-    public GameObject inventoryPrefab;
+    public GameObject inventoryPrefab ;
 
     public int X_START;
     public int Y_START;
@@ -23,11 +23,11 @@ public class DynamicInterface : UserInterface
             var obj = Instantiate(inventoryPrefab, Vector3.zero, Quaternion.identity, transform);
             obj.GetComponent<RectTransform>().localPosition = GetPosition(i);
 
-            AddEvent(obj, EventTriggerType.PointerEnter, delegate { OnEnter(obj); });
+            /*AddEvent(obj, EventTriggerType.PointerEnter, delegate { OnEnter(obj); });
             AddEvent(obj, EventTriggerType.PointerExit, delegate { OnExit(obj); });
             AddEvent(obj, EventTriggerType.BeginDrag, delegate { OnDragStart(obj); });
             AddEvent(obj, EventTriggerType.EndDrag, delegate { OnDragEnd(obj); });
-            AddEvent(obj, EventTriggerType.Drag, delegate { OnDrag(obj); });
+            AddEvent(obj, EventTriggerType.Drag, delegate { OnDrag(obj); });*/
 
             itemsDisplayed.Add(obj, inventory.Container.Items[i]);
         }

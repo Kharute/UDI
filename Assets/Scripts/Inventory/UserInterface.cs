@@ -8,9 +8,16 @@ using UnityEngine.Events;
 
 public abstract class UserInterface : MonoBehaviour
 {
-    public Player player;
+    //public Player player;
 
+    //inventory 안에 채워넣어야 함.
     public InventoryObject inventory;
+
+    private void Awake()
+    {
+        inventory = DataBaseManager.Inst.Inventory;
+    }
+
     public Dictionary<GameObject, InventorySlot> itemsDisplayed = new Dictionary<GameObject, InventorySlot>();
     void Start()
     {
@@ -19,8 +26,8 @@ public abstract class UserInterface : MonoBehaviour
             inventory.Container.Items[i].parent = this;
         }
         CreateSlots();
-        AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
-        AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });
+        /*AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
+        AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });*/
     }
 
     // Update is called once per frame
@@ -57,7 +64,7 @@ public abstract class UserInterface : MonoBehaviour
         trigger.triggers.Add(eventTrigger);
     }
 
-    public void OnEnter(GameObject obj)
+    /*public void OnEnter(GameObject obj)
     {
         player.mouseItem.hoverObj = obj;
         if (itemsDisplayed.ContainsKey(obj))
@@ -76,47 +83,12 @@ public abstract class UserInterface : MonoBehaviour
     {
         player.mouseItem.ui = null;
     }
-    public void OnDragStart(GameObject obj)
-    {
-        var mouseObject = new GameObject();
-        var rt = mouseObject.AddComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(50, 50);
-        mouseObject.transform.SetParent(transform.parent);
-        if (itemsDisplayed[obj].ID >= 0)
-        {
-            var img = mouseObject.AddComponent<Image>();
-            img.sprite = inventory.database.GetItem[itemsDisplayed[obj].ID].uiDisplay;
-            img.raycastTarget = false;
-        }
-        player.mouseItem.obj = mouseObject;
-        player.mouseItem.item = itemsDisplayed[obj];
-    }
-    public void OnDragEnd(GameObject obj)
-    {
-        var itemOnMouse = player.mouseItem;
-        var mouseHoverItem = itemOnMouse.hoverItem;
-        var mouseHoberObj = itemOnMouse.hoverObj;
-        var GetItemObject = inventory.database.GetItem;
-
-        if (itemOnMouse.ui != null)
-        {
-            if (mouseHoberObj)
-                if (mouseHoverItem.CanPlaceInSlot(GetItemObject[itemsDisplayed[obj].ID]) && (mouseHoverItem.item.Id <= -1 || (mouseHoverItem.item.Id >= 0 && itemsDisplayed[obj].CanPlaceInSlot(GetItemObject[mouseHoverItem.item.Id]))))
-                    inventory.MoveItem(itemsDisplayed[obj], mouseHoverItem.parent.itemsDisplayed[itemOnMouse.hoverObj]);
-
-        }
-        else
-        {
-            inventory.RemoveItem(itemsDisplayed[obj].item);
-        }
-        Destroy(itemOnMouse.obj);
-        itemOnMouse.item = null;
-    }
+    
     public void OnDrag(GameObject obj)
     {
         if (player.mouseItem.obj != null)
             player.mouseItem.obj.GetComponent<RectTransform>().position = Input.mousePosition;
-    }
+    }*/
 
 
 }
