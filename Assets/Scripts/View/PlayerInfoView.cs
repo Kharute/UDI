@@ -1,13 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerInfoView : MonoBehaviour
 {
+    // GameDataManager에서 값을 불러와줘야 함.
+
     [SerializeField] TextMeshProUGUI TextMesh_Name;
     [SerializeField] TextMeshProUGUI TextMesh_level;
     [SerializeField] TextMeshProUGUI TextMesh_exp;
@@ -16,7 +15,8 @@ public class PlayerInfoView : MonoBehaviour
         
     private PlayerInfoViewModel _vm;
 
-    
+    //레벨업하면 경험치바도 초기화 해야됨.
+    //InitSliderBar() 
     private void OnEnable()
     {
         if (_vm == null)
@@ -25,6 +25,7 @@ public class PlayerInfoView : MonoBehaviour
             _vm.PropertyChanged += OnPropertyChanged;
             _vm.RegisterEventsOnEnable(true); //true면 이벤트 ON, false면 이벤트 OFF
             _vm.RefreshViewModel_PlayerInfo();
+            
         }
     }
 
@@ -40,18 +41,26 @@ public class PlayerInfoView : MonoBehaviour
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
+        var _detailData = GameDataManager.Inst.GetPlayerDetailData(_vm.Level);
+
+        if (_detailData != null)
         {
-            case nameof(_vm.Name):
-                TextMesh_Name.text = _vm.Name;
-                break;
-            case nameof(_vm.Level):
-                TextMesh_level.text = _vm.Level.ToString();
-                break;
-            case nameof(_vm.Exp):
-                TextMesh_exp.text = _vm.Exp.ToString();
-                Slider_exp.value = _vm.Exp;
-                break;
+            switch (e.PropertyName)
+            {
+                case nameof(_vm.Name):
+                    TextMesh_Name.text = _vm.Name;
+                    break;
+                case nameof(_vm.Level):
+                    TextMesh_level.text = _vm.Level.ToString();
+                    if (Slider_exp != null)
+                        Slider_exp.maxValue = _detailData.REQEXP;
+                    break;
+                case nameof(_vm.Exp):
+                    TextMesh_exp.text = $"{_vm.Exp} / {_detailData.REQEXP} exp";
+                    Slider_exp.value = _vm.Exp;
+                    break;
+            }
         }
+        
     }
 }

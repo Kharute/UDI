@@ -22,33 +22,10 @@ public class DataBaseManager : MonoBehaviour
 
     private UserDetails _userDetails = null;
 
-    public int GetPlayerLevel()
-    {
-        if(_userDetails != null)
-            return _userDetails.LEVEL;
-        else
-            return 0;
-    }
-
-
-    // DB,xlsx,xml Call 문제가 발생했을 경우에, CallBack을 할 것.
-
     private string feedbackText;
-    //private Action<int, int> _hpChangedCallback;
 
-    [SerializeField]
-    InventoryObject inventory; //밖으로 뺄 수 있게 만들 것.
+    [SerializeField] InventoryObject AttendItems;
 
-    public InventoryObject Inventory
-    {
-        get
-        {
-            if (inventory == null)
-                inventory.Load();
-            
-            return inventory;
-        }
-    }
     public static DataBaseManager Inst
     {
         get
@@ -56,16 +33,35 @@ public class DataBaseManager : MonoBehaviour
             if (_instance == null)
             {
                 _instance = FindObjectOfType<DataBaseManager>();
-                // [TODO : KDH]이 구간에서 XML/JSON 파일을 불러와줄 것.
-                // TempInitPlayerList();
+                // [TODO : KDH] XML/JSON 파일을 불러와줄 것.
             }
             return _instance;
         }
     }
-    /*private void Awake()
+
+    #region Getter
+    public int GetPlayerLevel()
     {
-        inventory.Load();
-    }*/
+        if (_userDetails != null)
+            return _userDetails.LEVEL;
+        else
+            return 0;
+    }
+
+    #endregion
+
+    private void Start()
+    {
+        LoadInventory();
+    }
+    #region method
+    void LoadInventory()
+    {
+        //AttendItems.Load();
+    }
+    #endregion
+
+
     #region MVVM Register / UnRegister CallBack
 
     public void RegisterLoginCallback(Action<int, int> loginCallback, bool isLogin)
@@ -123,6 +119,7 @@ public class DataBaseManager : MonoBehaviour
     public void RequestLevelUp()
     {
         _userDetails.LEVEL += 1;
+        StartCoroutine(UpdateUserDetails("LEVEL", _userDetails.LEVEL, _userDetails.USER_ID));
         _levelUpCallback.Invoke(_userDetails.LEVEL);
     }
 
@@ -134,8 +131,22 @@ public class DataBaseManager : MonoBehaviour
 
     public void RequestExpGain(int exp)
     {
-        _userDetails.EXPERIENCE += exp;
-        _expUpCallback.Invoke(_userDetails.EXPERIENCE);
+        // 경험치얻은거 req 넘은지 체크하고 넘으면 값만큼 빼주고 레벨업 적용
+        // 예외처리 최고레벨일 경우 그냥 반환
+        if (_userDetails.LEVEL < GameDataManager.Inst.LevelInfoList.Count)
+        {
+            var _playerDetail = GameDataManager.Inst.GetPlayerDetailData(_userDetails.LEVEL);
+            _userDetails.EXPERIENCE += exp;
+            if (_userDetails.EXPERIENCE > _playerDetail.REQEXP)
+            {
+                _userDetails.EXPERIENCE -= _playerDetail.REQEXP;
+                Inst.RequestLevelUp();
+            }
+
+            StartCoroutine(UpdateUserDetails("EXPERIENCE", _userDetails.EXPERIENCE, _userDetails.USER_ID));
+            _expUpCallback.Invoke(_userDetails.EXPERIENCE);
+        }
+            
     }
 
     public void RequestJewelChange(int jewel)
@@ -145,7 +156,6 @@ public class DataBaseManager : MonoBehaviour
     }
 
     #endregion
-
 
     #region Login Event
 
@@ -233,11 +243,37 @@ public class DataBaseManager : MonoBehaviour
         }
     }
 
+    IEnumerator UpdateUserDetails(string column, int value, int userId)
+    {
+        string url = "http://localhost:3000/updateUserDetails";
+        WWWForm form = new WWWForm();
+        form.AddField("userId", userId);
+        form.AddField("column", column);
+        form.AddField("value", value);
+
+        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                feedbackText = "Error: " + www.error;
+            }
+            else
+            {
+                ProcessUserDetailsResponse(www.downloadHandler.text);
+            }
+        }
+    }
+
+
     void InitUserDetails(UserDetailsResponse user)
     {
         _userDetails = user.userDetails;
     }
     #endregion
+
+    
 }
 
 [System.Serializable]

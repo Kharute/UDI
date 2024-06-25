@@ -2,13 +2,9 @@ using UnityEngine;
 
 public enum ItemType
 {
-    Potion,
-    Helmet,
+    Goods, // ¿Á»≠
     Weapon,
-    Shield,
-    Boots,
-    Glove,
-    Default
+    Armor
 }
 
 public enum Attribute

@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Items>
+  <dataCategory>
+    <data ItemID="1" ItemName="검" Icon="icon_sword-pirate_LP" Description="검이다." Rarlity="COMMON" />
+    <data ItemID="2" ItemName="헬멧" Icon="icon_knight-head_LP" Description="헬멧이다." Rarlity="COMMON" />
+    <data ItemID="3" ItemName="갑옷" Icon="icon_clothes-medieval-fashion_LP" Description="갑옷이다" Rarlity="COMMON" />
+    <data ItemID="4" ItemName="장갑" Icon="icon_waving_LP" Description="장갑이다" Rarlity="COMMON" />
+    <data ItemID="5" ItemName="신발" Icon="icon_letter-T_LP" Description="신발이다" Rarlity="COMMON" />
+  </dataCategory>
+</Items>

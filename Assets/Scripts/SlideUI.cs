@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,37 +6,27 @@ using UnityEngine;
 
 public class SlideUI : MonoBehaviour
 {
-    [SerializeField]
-    Transform[] _trs;
+    bool isMenuOpen = false;
 
-    [SerializeField]
-    bool isOpened;
+    [SerializeField] bool isOpened;
+    [SerializeField] float moveValue = 200f;
+    [SerializeField] float rolltime = 1.5f;
 
-    [SerializeField]
-    float moveSpeed = 3f;
-
-    Action SetUIAction;
-
-    private void Awake()
-    {
-        //var obj = GameObject.Child<SlideUI>();    }
-    }
-    private void Update()
-    {
-        ChangePosition();
-    }
     public void OnClick_UI()
     {
+        StartCoroutine(SlideStateChange());
         isOpened = !isOpened;
     }
 
-    private void ChangePosition()
+    IEnumerator SlideStateChange()
     {
-        if(_trs != null)
-        {
-            var pos = isOpened ? _trs[0].position : _trs[1].position;
-            gameObject.transform.position = Vector2.Lerp(gameObject.transform.position, pos, moveSpeed * Time.deltaTime);
-        }
+        isMenuOpen = !isMenuOpen;
+
+        float upValue = isMenuOpen ? 1 : -1;
+        Vector3 vec = transform.position;
+        transform.DOMove(vec + Vector3.up * moveValue * upValue, rolltime);
+        
+        yield return new WaitForSeconds(rolltime);
     }
 
 }

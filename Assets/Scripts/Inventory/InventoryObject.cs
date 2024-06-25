@@ -13,17 +13,11 @@ public class InventoryObject : ScriptableObject
     public ItemDatabaseObject database;
     public Inventory Container;
 
-    public void AddItem(Item _item, int _amount)
+    public void AddItem(InventoryItem _item, int _amount)
     {
-        if (_item.buffs.Length > 0)
-        {
-            SetEmptySlot(_item, _amount);
-            return;
-        }
-
         for (int i = 0; i < Container.Items.Length; i++)
         {
-            if (Container.Items[i].ID == _item.Id)
+            if (Container.Items[i].ID == _item.itemID)
             {
                 Container.Items[i].AddAmount(_amount);
                 return;
@@ -32,13 +26,13 @@ public class InventoryObject : ScriptableObject
         SetEmptySlot(_item, _amount);
 
     }
-    public InventorySlot SetEmptySlot(Item _item, int _amount)
+    public InventorySlot SetEmptySlot(InventoryItem _item, int _amount)
     {
         for (int i = 0; i < Container.Items.Length; i++)
         {
             if (Container.Items[i].ID <= -1)
             {
-                Container.Items[i].UpdateSlot(_item.Id, _item, _amount);
+                Container.Items[i].UpdateSlot(_item.itemID, _item, _amount);
                 return Container.Items[i];
             }
         }
@@ -53,8 +47,7 @@ public class InventoryObject : ScriptableObject
         item1.UpdateSlot(temp.ID, temp.item, temp.amount);
     }
 
-
-    public void RemoveItem(Item _item)
+    public void RemoveItem(InventoryItem _item)
     {
         for (int i = 0; i < Container.Items.Length; i++)
         {
@@ -83,23 +76,35 @@ public class InventoryObject : ScriptableObject
     [ContextMenu("Load")]
     public void Load()
     {
-        if (File.Exists(string.Concat(Application.dataPath, savePath)))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(string.Concat(Application.dataPath, savePath), FileMode.Open);
-            JsonUtility.FromJsonOverwrite(bf.Deserialize(file).ToString(), this);
-            file.Close();
+        string fullPath = string.Concat(Application.dataPath, savePath);
+        Debug.Log("Loading from path: " + fullPath);
 
-            /*IFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(string.Concat(Application.persistentDataPath, savePath), FileMode.Open, FileAccess.Read);
-            Inventory newContainer = (Inventory)formatter.Deserialize(stream);
-            for (int i = 0; i < Container.Items.Length; i++)
+        if (File.Exists(fullPath))
+        {
+            Debug.Log("File exists. Attempting to load.");
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(fullPath, FileMode.Open);
+
+            try
             {
-                Container.Items[i].UpdateSlot(newContainer.Items[i].ID, newContainer.Items[i].item, newContainer.Items[i].amount);
+                JsonUtility.FromJsonOverwrite(bf.Deserialize(file).ToString(), this);
+                Debug.Log("Load successful.");
             }
-            stream.Close();*/
+            catch (SerializationException e)
+            {
+                Debug.LogError("Failed to load file. Error: " + e.Message);
+            }
+            finally
+            {
+                file.Close();
+            }
+        }
+        else
+        {
+            Debug.LogWarning("File does not exist: " + fullPath);
         }
     }
+
     [ContextMenu("Clear")]
     public void Clear()
     {
@@ -109,12 +114,12 @@ public class InventoryObject : ScriptableObject
 [System.Serializable]
 public class Inventory
 {
-    public InventorySlot[] Items = new InventorySlot[20];
+    public InventorySlot[] Items = new InventorySlot[31];
     public void Clear()
     {
         for (int i = 0; i < Items.Length; i++)
         {
-            Items[i].UpdateSlot(-1, new Item(), 0);
+            Items[i].UpdateSlot(-1, new InventoryItem(), 0);
         }
     }
 }
@@ -124,7 +129,7 @@ public class InventorySlot
     public ItemType[] AllowedItems = new ItemType[0];
     public UserInterface parent;
     public int ID = -1;
-    public Item item;
+    public InventoryItem item;
     public int amount;
     public InventorySlot()
     {
@@ -132,13 +137,13 @@ public class InventorySlot
         item = null;
         amount = 0;
     }
-    public InventorySlot(int _id, Item _item, int _amount)
+    public InventorySlot(int _id, InventoryItem _item, int _amount)
     {
         ID = _id;
         item = _item;
         amount = _amount;
     }
-    public void UpdateSlot(int _id, Item _item, int _amount)
+    public void UpdateSlot(int _id, InventoryItem _item, int _amount)
     {
         ID = _id;
         item = _item;

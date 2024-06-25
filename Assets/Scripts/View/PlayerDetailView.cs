@@ -40,7 +40,7 @@ public class PlayerDetailView : MonoBehaviour
              TextMesh_Atk.text = character.ATK.ToString();
              TextMesh_Def.text = character.DEF.ToString();
              TextMesh_Spd.text = character.SPD.ToString();
-            TextMesh_ReqExp.text = character.REQEXP.ToString();
+             TextMesh_ReqExp.text = character.REQEXP.ToString();
             
         }
         

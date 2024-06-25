@@ -15,7 +15,7 @@ public abstract class UserInterface : MonoBehaviour
 
     private void Awake()
     {
-        inventory = DataBaseManager.Inst.Inventory;
+        
     }
 
     public Dictionary<GameObject, InventorySlot> itemsDisplayed = new Dictionary<GameObject, InventorySlot>();
@@ -43,7 +43,7 @@ public abstract class UserInterface : MonoBehaviour
         {
             if (_slot.Value.ID >= 0)
             {
-                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = inventory.database.GetItem[_slot.Value.item.Id].uiDisplay;
+                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = inventory.database.GetItem[_slot.Value.item.itemID].icon;
                 _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 1);
                 _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = _slot.Value.amount == 1 ? "" : _slot.Value.amount.ToString("n0");
             }
