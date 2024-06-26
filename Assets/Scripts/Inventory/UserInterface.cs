@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using Unity.VisualScripting;
 
 public abstract class UserInterface : MonoBehaviour
 {
@@ -35,16 +36,20 @@ public abstract class UserInterface : MonoBehaviour
     {
         UpdateSlots();
     }
+
     public abstract void CreateSlots();
 
     public void UpdateSlots()
     {
+        int i = 0;
         foreach (KeyValuePair<GameObject, InventorySlot> _slot in itemsDisplayed)
         {
-            if (_slot.Value.ID >= 0)
+            if (_slot.Value.SlotID >= 0)
             {
-                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = inventory.database.GetItem[_slot.Value.item.itemID].icon;
-                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 1);
+                GameObject obj = _slot.Key.transform.GetChild(0).gameObject;
+                Image image = obj.GetComponent<Image>();
+                image.sprite = inventory.Attend_DataBase.GetItem[_slot.Value.SlotID].icon;
+                image.color = new Color(1, 1, 1, 1);
                 _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = _slot.Value.amount == 1 ? "" : _slot.Value.amount.ToString("n0");
             }
             else

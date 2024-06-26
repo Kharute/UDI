@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
@@ -16,11 +17,12 @@ public class InventoryXMLLoader : MonoBehaviour
         foreach (XmlNode itemNode in itemList)
         {
             InventoryItemData itemData = new InventoryItemData();
-            itemData.id = int.Parse(itemNode.Attributes["ItemID"].Value);
+            itemData.itemID = int.Parse(itemNode.Attributes["ItemID"].Value);
+            itemData.itemType = (ItemType)Enum.Parse(typeof(ItemType), itemNode.Attributes["ItemType"].Value);
             itemData.name = itemNode.Attributes["ItemName"].Value;
             itemData.iconPath = itemNode.Attributes["Icon"].Value;
             itemData.description = itemNode.Attributes["Description"].Value;
-            itemData.rarity = itemNode.Attributes["Rarlity"].Value;
+            
             items.Add(itemData);
         }
 

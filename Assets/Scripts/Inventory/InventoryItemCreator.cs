@@ -13,11 +13,12 @@ public class InventoryItemCreator : MonoBehaviour
         foreach (InventoryItemData itemData in items)
         {
             InventoryItem item = ScriptableObject.CreateInstance<InventoryItem>();
-            item.itemID = itemData.id;
+            item.itemID = itemData.itemID;
+            item.itemType = itemData.itemType;
             item.itemName = itemData.name;
             item.icon = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Resources/Icons/{itemData.iconPath}.png");
             item.description = itemData.description;
-            item.rarity = itemData.rarity;
+            
 
             string assetPath = $"Assets/InventoryItems/{item.itemID}_{item.itemName}.asset";
             AssetDatabase.CreateAsset(item, assetPath);

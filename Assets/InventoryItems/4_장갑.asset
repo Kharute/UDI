@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "4_\uC7A5\uAC11"
   m_EditorClassIdentifier: 
   itemID: 4
+  ItemType: 1
   itemName: "\uC7A5\uAC11"
   icon: {fileID: 21300000, guid: 5f6056f6482198746a79c6b617d109d1, type: 3}
   description: "\uC7A5\uAC11\uC774\uB2E4"
-  rarity: COMMON

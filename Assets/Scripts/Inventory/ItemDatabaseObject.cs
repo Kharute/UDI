@@ -11,16 +11,14 @@ public class ItemDatabaseObject : ScriptableObject, ISerializationCallbackReceiv
 
     public void OnAfterDeserialize()
     {
-        /*GetId = new Dictionary<ItemObject, int>(GetId);
-        GetItem = new Dictionary<int, ItemObject>(GetItem);*/
-        /*if (items != null)
-        {
+        if (items != null)
+        { 
             for (int i = 0; i < items.Length; i++)
             {
                 items[i].itemID = i;
                 GetItem.Add(i, items[i]);
             }
-        }*/
+        }
     }
 
     public void OnBeforeSerialize()

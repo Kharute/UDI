@@ -32,6 +32,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-2087795561-0
         - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1248622752-0
         - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1752628556-0
+        - globalObjectIdString: GlobalObjectId_V1-2-9fc0d4010bbf28b4594072e72b8655ab-1166814531-0
         values:
         - colorIndex: 2
           iconNameOrGuid: 
@@ -39,5 +40,7 @@ MonoBehaviour:
           iconNameOrGuid: PreMatCylinder
         - colorIndex: 2
           iconNameOrGuid: 
-        - colorIndex: 0
+        - colorIndex: 4
           iconNameOrGuid: MeshCollider Icon
+        - colorIndex: 2
+          iconNameOrGuid: 

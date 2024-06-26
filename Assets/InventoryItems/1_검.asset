@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "1_\uAC80"
   m_EditorClassIdentifier: 
   itemID: 1
+  ItemType: 0
   itemName: "\uAC80"
   icon: {fileID: 21300000, guid: bf0d29e2b0f93f841824fbb0a5f2fa7e, type: 3}
   description: "\uAC80\uC774\uB2E4."
-  rarity: COMMON

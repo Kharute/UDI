@@ -2,17 +2,9 @@ using UnityEngine;
 
 public enum ItemType
 {
-    Goods, // ¿Á»≠
     Weapon,
-    Armor
-}
-
-public enum Attribute
-{
-    Agility,
-    Intellect,
-    Stamina,
-    Strength
+    Armor,
+    Goods
 }
 
 public class ItemObject : ScriptableObject
@@ -49,18 +41,11 @@ public class Item
         Name = item.name;
         Id = item.ID;
         buffs = new ItemBuff[item.buffs.Length];
-
-        for(int i = 0; i < buffs.Length; i++)
-        {
-            buffs[i] = new ItemBuff(item.buffs[i].min, item.buffs[i].max);
-            buffs[i].attribute = item.buffs[i].attribute;
-        }
     }
 }
 [System.Serializable]
 public class ItemBuff
 {
-    public Attribute attribute;
     public int value;
     public int min;
     public int max;
