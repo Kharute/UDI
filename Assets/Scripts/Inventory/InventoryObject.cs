@@ -13,11 +13,11 @@ public class InventoryObject : ScriptableObject
     public ItemDatabaseObject Attend_DataBase;
     public Inventory Container;
 
-    public void AddItem(InventoryItem _item, int _amount)
+    public void AddItem(Item_Scrptable _item, int _amount)
     {
         for (int i = 0; i < Container.Items.Length; i++)
         {
-            if (Container.Items[i].item.itemID == _item.itemID)
+            if (Container.Items[i].item.itemKey.ItemID == _item.itemKey.ItemID)
             {
                 Container.Items[i].AddAmount(_amount);
                 return;
@@ -26,11 +26,11 @@ public class InventoryObject : ScriptableObject
         SetEmptySlot(_item, _amount);
 
     }
-    public InventorySlot SetEmptySlot(InventoryItem _item, int _amount)
+    public InventorySlot SetEmptySlot(Item_Scrptable _item, int _amount)
     {
         for (int i = 0; i < Container.Items.Length; i++)
         {
-            if (Container.Items[i].item.itemID <= 0)
+            if (Container.Items[i].item.itemKey.ItemID <= 0)
             {
                 Container.Items[i].UpdateSlot(_item, _amount);
                 return Container.Items[i];
@@ -47,7 +47,7 @@ public class InventoryObject : ScriptableObject
         item1.UpdateSlot(temp.item, temp.amount);
     }
 
-    public void RemoveItem(InventoryItem _item)
+    public void RemoveItem(Item_Scrptable _item)
     {
         for (int i = 0; i < Container.Items.Length; i++)
         {
@@ -119,7 +119,7 @@ public class Inventory
     {
         for (int i = 0; i < Items.Length; i++)
         {
-            Items[i].UpdateSlot(new InventoryItem(), 0);
+            Items[i].UpdateSlot(new Item_Scrptable(), 0);
         }
     }
 }
@@ -128,19 +128,20 @@ public class InventorySlot
 {
     public UserInterface parent;
     public int SlotID;
-    public InventoryItem item;
+    public Item_Scrptable item;
     public int amount;
+
     public InventorySlot()
     {
         item = null;
         amount = 0;
     }
-    public InventorySlot(InventoryItem _item, int _amount)
+    public InventorySlot(Item_Scrptable _item, int _amount)
     {
         item = _item;
         amount = _amount;
     }
-    public void UpdateSlot(InventoryItem _item, int _amount)
+    public void UpdateSlot(Item_Scrptable _item, int _amount)
     {
         item = _item;
         amount = _amount;

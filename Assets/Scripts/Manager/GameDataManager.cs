@@ -1,9 +1,17 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
+using static UnityEditor.Progress;
+
+
+public enum ItemType
+{
+    Weapon,
+    Armor,
+    Goods
+}
 
 public class GameDataManager : MonoBehaviour
 {
@@ -11,7 +19,8 @@ public class GameDataManager : MonoBehaviour
 
     // 레벨 관련, 아이템 정보,
     public Dictionary<int, Levels> LevelInfoList { get; private set; }
-    public Dictionary<int, Item> ItemInfoList { get; private set; }
+    public Dictionary<ItemKey, Item> ItemInfoList { get; private set; }
+    public Dictionary<int, AttendItem> AttendItemInfoList { get; private set; }
 
     private string _dataRootPath;
 
@@ -26,6 +35,7 @@ public class GameDataManager : MonoBehaviour
     {
         ReadData(nameof(Levels)); // == ReadData("Character")
         ReadData(nameof(Item));
+        ReadData(nameof(AttendItem));
     }
 
     private void ReadData(string tableName)
@@ -38,8 +48,14 @@ public class GameDataManager : MonoBehaviour
             case nameof(Item):
                 ReadItemTable(tableName);
                 break;
+            case nameof(AttendItem):
+                ReadAttendItemTable(tableName);
+                break;
         }
     }
+
+    #region Read XML Files
+
     private void ReadLevelsTable(string tableName)
     {
         LevelInfoList = new Dictionary<int, Levels>();
@@ -62,43 +78,47 @@ public class GameDataManager : MonoBehaviour
 
     private void ReadItemTable(string tableName)
     {
-        /*ItemInfoList = new Dictionary<int, Item>();
+        ItemInfoList = new Dictionary<ItemKey, Item>();
 
         XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
         var dataElements = doc.Descendants("data");
 
         foreach (var data in dataElements)
         {
-            var tempCharacter = new Character();
-            tempCharacter.DataId = int.Parse(data.Attribute(nameof(tempCharacter.DataId)).Value);
-            tempCharacter.Name = data.Attribute(nameof(tempCharacter.Name)).Value;
-            tempCharacter.Description = data.Attribute(nameof(tempCharacter.Description)).Value;
-            tempCharacter.IconPath = data.Attribute(nameof(tempCharacter.IconPath)).Value;
-            tempCharacter.PrefabPath = data.Attribute(nameof(tempCharacter.PrefabPath)).Value;
+            Item itemData = new Item();
+            ItemKey key = new ItemKey();
+            string a = nameof(itemData.ItemKey.ItemID);
+            int itemKeyID = int.Parse(data.Attribute(a).Value);
+            ItemType itemKeyType = (ItemType)Enum.Parse(typeof(ItemType), data.Attribute(nameof(itemData.ItemKey.ItemType)).Value);
+            key.SetItemKey(itemKeyID, itemKeyType);
 
-            string skillNameListStr = data.Attribute("SkillNameList").Value;
-            if (!string.IsNullOrEmpty(skillNameListStr))
-            {
-                skillNameListStr = skillNameListStr.Replace("{", string.Empty);
-                skillNameListStr = skillNameListStr.Replace("}", string.Empty);
+            itemData.ItemKey = key;
+            itemData.ItemName = data.Attribute(nameof(itemData.ItemName)).Value;
+            itemData.Icon = data.Attribute(nameof(itemData.Icon)).Value;
+            itemData.Description = data.Attribute(nameof(itemData.Description)).Value;
 
-                var skillNames = skillNameListStr.Split(',');
-
-                var list = new List<string>();
-                if (skillNames.Length > 0)
-                {
-                    foreach (var name in skillNames)
-                    {
-                        list.Add(name);
-                    }
-                }
-                tempCharacter.SkillClassNameList = list;
-            }
-
-            LoadedCharacterList.Add(tempCharacter.DataId, tempCharacter);
-        }*/
+            ItemInfoList.Add(itemData.ItemKey, itemData);
+        }
     }
 
+    private void ReadAttendItemTable(string tableName)
+    {
+        AttendItemInfoList = new Dictionary<int, AttendItem>();
 
+        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        var dataElements = doc.Descendants("data");
+
+        foreach (var data in dataElements)
+        {
+            AttendItem attendItemData = new AttendItem();
+            attendItemData.Day = int.Parse(data.Attribute(nameof(attendItemData.Day)).Value);
+            attendItemData.ItemID = int.Parse(data.Attribute(nameof(attendItemData.ItemID)).Value);
+            attendItemData.Amount = int.Parse(data.Attribute(nameof(attendItemData.Amount)).Value);
+
+            AttendItemInfoList.Add(attendItemData.Day, attendItemData);
+        }
+    }
+
+    #endregion
 
 }

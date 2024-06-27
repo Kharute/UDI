@@ -1,65 +1,67 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using Unity.VisualScripting;
 
 public abstract class UserInterface : MonoBehaviour
 {
     //public Player player;
 
-    //inventory 안에 채워넣어야 함.
-    public InventoryObject inventory;
-
-    private void Awake()
-    {
-        
-    }
-
-    public Dictionary<GameObject, InventorySlot> itemsDisplayed = new Dictionary<GameObject, InventorySlot>();
+    public Dictionary<GameObject, AttendItem> itemsDisplayed = new Dictionary<GameObject, AttendItem>();
     void Start()
     {
-        for (int i = 0; i < inventory.Container.Items.Length; i++)
-        {
-            inventory.Container.Items[i].parent = this;
-        }
         CreateSlots();
+        
         /*AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
         AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });*/
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
     {
         UpdateSlots();
     }
-
     public abstract void CreateSlots();
 
-    public void UpdateSlots()
+    /*void Update()
     {
-        int i = 0;
-        foreach (KeyValuePair<GameObject, InventorySlot> _slot in itemsDisplayed)
+        UpdateSlots();
+    }*/
+
+    void UpdateSlots()
+    {
+        int LoginCount = DataBaseManager.Inst.GetLoginCountMonth();
+        int loginCounts = 0;
+
+        foreach (KeyValuePair<GameObject, AttendItem> _slot in itemsDisplayed)
         {
-            if (_slot.Value.SlotID >= 0)
+            GameObject IconObj = _slot.Key.transform.GetChild(0).gameObject;
+            GameObject BlerImg = _slot.Key.transform.GetChild(2).gameObject;
+            Image iconImage = IconObj.GetComponent<Image>();
+
+            
+            ItemKey itemKey = new ItemKey();
+            itemKey.SetItemKey(_slot.Value.ItemID, ItemType.Goods);
+
+            if (GameDataManager.Inst.ItemInfoList.ContainsKey(itemKey))
             {
-                GameObject obj = _slot.Key.transform.GetChild(0).gameObject;
-                Image image = obj.GetComponent<Image>();
-                image.sprite = inventory.Attend_DataBase.GetItem[_slot.Value.SlotID].icon;
-                image.color = new Color(1, 1, 1, 1);
-                _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = _slot.Value.amount == 1 ? "" : _slot.Value.amount.ToString("n0");
-            }
-            else
-            {
-                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = null;
-                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 0);
-                _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = "";
+                GameDataManager.Inst.ItemInfoList.TryGetValue(itemKey, out Item item);
+                
+                var path = $"Icons/{item.Icon}";
+                iconImage.sprite = Resources.Load<Sprite>(path);
+                
+                iconImage.color = new Color(1, 1, 1, 1);
+                _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = _slot.Value.Amount == 1 ? "" : _slot.Value.Amount.ToString("n0");
+
+                if (loginCounts++ < LoginCount)
+                    BlerImg.SetActive(true);
+                else
+                    BlerImg.SetActive(false);
             }
         }
     }
+
     protected void AddEvent(GameObject obj, EventTriggerType type, UnityAction<BaseEventData> action)
     {
         EventTrigger trigger = obj.GetComponent<EventTrigger>();
