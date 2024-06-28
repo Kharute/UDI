@@ -18,7 +18,8 @@ public class DataBaseManager : MonoBehaviour
     private int _loginCountMonth;
     private bool _isFirstLogin;
 
-    private string feedbackText;
+    private LoginResponse login_feedback = new();
+    private UserGoodsResponse goods_feedback = new();
 
     public static DataBaseManager Inst
     {
@@ -138,10 +139,10 @@ public class DataBaseManager : MonoBehaviour
     #endregion
 
     #region Login Event
-    public string RequestLogin(string username, string password)
+    public LoginResponse RequestLogin(string username, string password)
     {
         StartCoroutine(Login(username, password));
-        return feedbackText;
+        return login_feedback;
     }
 
     IEnumerator Login(string username, string password)
@@ -157,7 +158,9 @@ public class DataBaseManager : MonoBehaviour
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
-                feedbackText = "Error: " + www.error;
+                login_feedback.message = "Error: " + www.error;
+                login_feedback.success = false;
+
             }
             else
             {
@@ -165,7 +168,8 @@ public class DataBaseManager : MonoBehaviour
 
                 if (loginResponse.success)
                 {
-                    feedbackText = "Login successful!";
+                    login_feedback.message = "Login successful!";
+                    login_feedback.success = true;
                     InitUserDetails(loginResponse.userDetails);
                     _loginCountMonth = loginResponse.loginCountMonth; // Save the login count month
                     _isFirstLogin = loginResponse.isFirstLogin; // Save isFirstLogin status
@@ -173,7 +177,8 @@ public class DataBaseManager : MonoBehaviour
                 }
                 else
                 {
-                    feedbackText = "Login failed: " + loginResponse.message;
+                    login_feedback.message = "Login failed: " + loginResponse.message;
+                    login_feedback.success = false;
                 }
             }
         }
@@ -193,11 +198,42 @@ public class DataBaseManager : MonoBehaviour
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
-                feedbackText = "Error: " + www.error;
+                login_feedback.message = "Error: " + www.error;
+                login_feedback.success = false;
             }
             else
             {
                 ProcessUserDetailsResponse(www.downloadHandler.text);
+            }
+        }
+    }
+
+    public void OnClick_UpdateUserGoods(string column, int value)
+    {
+         StartCoroutine(UpdateUserGoods(column, value, _userDetails.USER_ID));
+    }
+
+    IEnumerator UpdateUserGoods(string column, int value, int userId)
+    {
+        string url = "http://localhost:3000/updateUserGoods";
+        WWWForm form = new WWWForm();
+        form.AddField("userId", userId);
+        form.AddField("column", column);
+        form.AddField("value", value);
+
+        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                login_feedback.message = "Error: " + www.error;
+                login_feedback.success = false;
+            }
+            else
+            {
+                ProcessUserGoodsResponse(www.downloadHandler.text);
+                Invoke("", 0.5f);
             }
         }
     }
@@ -213,14 +249,29 @@ public class DataBaseManager : MonoBehaviour
 
         if (userDetailsResponse.success)
         {
-            feedbackText = "User details retrieved successfully!";
+            login_feedback.message = "User details retrieved successfully!";
             InitUserDetails(userDetailsResponse.userDetails);
         }
         else
         {
-            feedbackText = "Failed to retrieve user details: " + userDetailsResponse.message;
+            login_feedback.message = "Failed to retrieve user details: " + userDetailsResponse.message;
         }
     }
+
+    void ProcessUserGoodsResponse(string response)
+    {
+        UserGoodsResponse userDetailsResponse = JsonUtility.FromJson<UserGoodsResponse>(response);
+
+        if (userDetailsResponse.success)
+        {
+            login_feedback.message = "User goods retrieved successfully!";
+        }
+        else
+        {
+            login_feedback.message = "Failed to retrieve user goods: " + userDetailsResponse.message;
+        }
+    }
+
     #endregion
 }
 
@@ -241,6 +292,14 @@ public class UserDetailsResponse
     public string message;
     public UserDetails userDetails;
 }
+
+[System.Serializable]
+public class UserGoodsResponse
+{
+    public bool success;
+    public string message;
+}
+
 
 [System.Serializable]
 public class UserDetails

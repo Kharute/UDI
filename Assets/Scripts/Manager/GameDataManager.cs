@@ -19,7 +19,7 @@ public class GameDataManager : MonoBehaviour
 
     // 레벨 관련, 아이템 정보,
     public Dictionary<int, Levels> LevelInfoList { get; private set; }
-    public Dictionary<ItemKey, Item> ItemInfoList { get; private set; }
+    public Dictionary<string, Item> ItemInfoList { get; private set; }
     public Dictionary<int, AttendItem> AttendItemInfoList { get; private set; }
 
     private string _dataRootPath;
@@ -30,7 +30,7 @@ public class GameDataManager : MonoBehaviour
         _dataRootPath = Application.dataPath;
         ReadAllDataOnAwake();
     }
-
+        
     private void ReadAllDataOnAwake()
     {
         ReadData(nameof(Levels)); // == ReadData("Character")
@@ -78,7 +78,7 @@ public class GameDataManager : MonoBehaviour
 
     private void ReadItemTable(string tableName)
     {
-        ItemInfoList = new Dictionary<ItemKey, Item>();
+        ItemInfoList = new Dictionary<string, Item>();
 
         XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
         var dataElements = doc.Descendants("data");
@@ -86,18 +86,15 @@ public class GameDataManager : MonoBehaviour
         foreach (var data in dataElements)
         {
             Item itemData = new Item();
-            ItemKey key = new ItemKey();
-            string a = nameof(itemData.ItemKey.ItemID);
-            int itemKeyID = int.Parse(data.Attribute(a).Value);
-            ItemType itemKeyType = (ItemType)Enum.Parse(typeof(ItemType), data.Attribute(nameof(itemData.ItemKey.ItemType)).Value);
-            key.SetItemKey(itemKeyID, itemKeyType);
 
-            itemData.ItemKey = key;
+            itemData.ClassName = data.Attribute(nameof(itemData.ClassName)).Value;
+            itemData.ItemID = int.Parse(data.Attribute(nameof(itemData.ItemID)).Value);
+            itemData.ItemType = (ItemType)Enum.Parse(typeof(ItemType), data.Attribute(nameof(itemData.ItemType)).Value);
             itemData.ItemName = data.Attribute(nameof(itemData.ItemName)).Value;
             itemData.Icon = data.Attribute(nameof(itemData.Icon)).Value;
             itemData.Description = data.Attribute(nameof(itemData.Description)).Value;
 
-            ItemInfoList.Add(itemData.ItemKey, itemData);
+            ItemInfoList.Add(itemData.ClassName, itemData);
         }
     }
 

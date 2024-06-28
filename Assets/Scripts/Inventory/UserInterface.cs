@@ -24,11 +24,6 @@ public abstract class UserInterface : MonoBehaviour
     }
     public abstract void CreateSlots();
 
-    /*void Update()
-    {
-        UpdateSlots();
-    }*/
-
     void UpdateSlots()
     {
         int LoginCount = DataBaseManager.Inst.GetLoginCountMonth();
@@ -40,13 +35,13 @@ public abstract class UserInterface : MonoBehaviour
             GameObject BlerImg = _slot.Key.transform.GetChild(2).gameObject;
             Image iconImage = IconObj.GetComponent<Image>();
 
-            
-            ItemKey itemKey = new ItemKey();
-            itemKey.SetItemKey(_slot.Value.ItemID, ItemType.Goods);
+            /*ItemKey itemKey = new ItemKey();
+            itemKey.SetItemKey(_slot.Value.ItemID, ItemType.Goods);*/
 
-            if (GameDataManager.Inst.ItemInfoList.ContainsKey(itemKey))
+
+            if (GameDataManager.Inst.ItemInfoList != null)
             {
-                GameDataManager.Inst.ItemInfoList.TryGetValue(itemKey, out Item item);
+                GameDataManager.Inst.ItemInfoList.TryGetValue(_slot.Value.ClassName, out Item item);
                 
                 var path = $"Icons/{item.Icon}";
                 iconImage.sprite = Resources.Load<Sprite>(path);
@@ -96,8 +91,6 @@ public abstract class UserInterface : MonoBehaviour
         if (player.mouseItem.obj != null)
             player.mouseItem.obj.GetComponent<RectTransform>().position = Input.mousePosition;
     }*/
-
-
 }
 public class MouseItem
 {

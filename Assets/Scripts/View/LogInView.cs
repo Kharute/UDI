@@ -45,9 +45,16 @@ public class LogInView : MonoBehaviour
         }
         else
         {
-            feedbackText.text = DataBaseManager.Inst.RequestLogin(username, password);
-            //[TODO]없다면 호출하면 안됨
-            gameObject.SetActive(false); // 상황에 맞게 조절해야 함.
+            LoginResponse log_res = DataBaseManager.Inst.RequestLogin(username, password);
+
+            if (log_res.success)
+            {
+                 gameObject.SetActive(false);
+            }
+            else
+            {
+                 feedbackText.text = log_res.message;
+            }
         }
     }
 }

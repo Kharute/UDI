@@ -18,8 +18,9 @@ public class InventoryXMLLoader : MonoBehaviour
         foreach (XmlNode itemNode in itemList)
         {
             Item itemData = new Item();
-            itemData.ItemKey.ItemID = int.Parse(itemNode.Attributes["ItemID"].Value);
-            itemData.ItemKey.ItemType = (ItemType)Enum.Parse(typeof(ItemType), itemNode.Attributes["ItemType"].Value);
+            itemData.ClassName = itemNode.Attributes["ItemID"].Value;
+            itemData.ItemID = int.Parse(itemNode.Attributes["ItemID"].Value);
+            itemData.ItemType = (ItemType)Enum.Parse(typeof(ItemType), itemNode.Attributes["ItemType"].Value);
             itemData.ItemName = itemNode.Attributes["ItemName"].Value;
             itemData.Icon = itemNode.Attributes["Icon"].Value;
             itemData.Description = itemNode.Attributes["Description"].Value;

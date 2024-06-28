@@ -4,7 +4,9 @@ using static UnityEditor.Progress;
 
 public class Item_Scrptable : ScriptableObject
 {
-    public ItemKey itemKey;
+    public string ClassName;
+    public ItemType ItemType;
+    public int ItemID;
     public string itemName;
     public Sprite icon;
     public string description;
@@ -13,7 +15,9 @@ public class Item_Scrptable : ScriptableObject
 [System.Serializable]
 public class Item
 {
-    public ItemKey ItemKey;
+    public string ClassName;
+    public ItemType ItemType;
+    public int ItemID;
     public string ItemName;
     public string Icon;
     public string Description;   
@@ -49,7 +53,7 @@ public class ItemKey
 public class AttendItem
 {
     public int Day;
-    public int ItemID;
+    public string ClassName;
     public int Amount;
 }
 

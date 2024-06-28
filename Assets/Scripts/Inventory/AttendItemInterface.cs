@@ -41,4 +41,6 @@ public class AttendItemInterface : UserInterface
             AddEvent(obj, EventTriggerType.Drag, delegate { OnDrag(obj); });*//*
         }*/
     }
+
+    
 }

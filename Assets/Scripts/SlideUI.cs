@@ -6,26 +6,23 @@ using UnityEngine;
 
 public class SlideUI : MonoBehaviour
 {
-    bool isMenuOpen = false;
-
-    [SerializeField] bool isOpened;
+    [SerializeField] bool isOpened = false;
     [SerializeField] float moveValue = 200f;
     [SerializeField] float rolltime = 1.5f;
 
     public void OnClick_UI()
     {
         StartCoroutine(SlideStateChange());
-        isOpened = !isOpened;
     }
 
     IEnumerator SlideStateChange()
     {
-        isMenuOpen = !isMenuOpen;
+        isOpened = !isOpened;
 
-        float upValue = isMenuOpen ? 1 : -1;
+        float upValue = isOpened ? 1 : -1;
         Vector3 vec = transform.position;
         transform.DOMove(vec + Vector3.up * moveValue * upValue, rolltime);
-        
+
         yield return new WaitForSeconds(rolltime);
     }
 
