@@ -9,7 +9,6 @@ public class PlayerInfoViewModel : ViewModelBase
     private int _level;
     private int _exp;
 
-
     public string Name
     {
         get { return _userName; }

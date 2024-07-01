@@ -3,18 +3,35 @@ using UnityEngine.Networking;
 using System.Collections;
 using System;
 
+public enum UserGoodsType
+{
+    GOLD,
+    JEWEL,
+    TICKET_WEAPON,
+    TICKET_ARMOR
+}
+
 public class DataBaseManager : MonoBehaviour
 {
+    [SerializeField]
+    OutGameView outGameView;
+
+    [SerializeField]
+    InGameView inGameView;
+
     private static DataBaseManager _instance = null;
 
     private Action<int, int> _loginCallback;
     private Action<UserDetails> _playerInfoCallback;
     private Action<int> _levelUpCallback;
     private Action<int> _expUpCallback;
-    private Action<int> _goldChangedCallback;
-    private Action<int> _jewelChangedCallback;
+    private Action<UserGoodsType, int> _goldChangedCallback;
+    private Action<UserGoodsType, int> _jewelChangedCallback;
+    private Action<UserGoodsType, int> _ticket_weaponChangedCallback;
+    private Action<UserGoodsType, int> _ticket_armorChangedCallback;
 
     private UserDetails _userDetails = null;
+    private UserGoods _userGoods = null;
     private int _loginCountMonth;
     private bool _isFirstLogin;
 
@@ -31,6 +48,11 @@ public class DataBaseManager : MonoBehaviour
             }
             return _instance;
         }
+    }
+
+    private void Awake()
+    {
+        _userGoods = new UserGoods();
     }
 
     #region Getter
@@ -75,24 +97,51 @@ public class DataBaseManager : MonoBehaviour
             _levelUpCallback -= levelUpCallback;
     }
 
-    public void RegisterGoldChangedCallback(Action<int> goldChangedCallback, bool isGold)
+    public void Register_GoodsChangedCallback(Action<UserGoodsType, int> valueChangedCallback, UserGoodsType type, bool value)
     {
-        if (isGold)
-            _goldChangedCallback += goldChangedCallback;
-        else
-            _goldChangedCallback -= goldChangedCallback;
+        switch (type)
+        {
+            case UserGoodsType.GOLD:
+                {
+                    if (value)
+                        _goldChangedCallback += valueChangedCallback;
+                    else
+                        _goldChangedCallback -= valueChangedCallback;
+                    break;
+                }
+            case UserGoodsType.JEWEL:
+                {
+                    if (value)
+                        _jewelChangedCallback += valueChangedCallback;
+                    else
+                        _jewelChangedCallback -= valueChangedCallback;
+                }
+                break;
+            case UserGoodsType.TICKET_WEAPON:
+                {
+                    if (value)
+                        _ticket_weaponChangedCallback += valueChangedCallback;
+                    else
+                        _ticket_weaponChangedCallback -= valueChangedCallback;
+                }
+                break;
+
+            case UserGoodsType.TICKET_ARMOR:
+                {
+                    if (value)
+                        _ticket_armorChangedCallback += valueChangedCallback;
+                    else
+                        _ticket_armorChangedCallback -= valueChangedCallback;
+                }
+                break;
+        }
     }
 
-    public void RegisterJewelChangedCallback(Action<int> jewelChangedCallback, bool isJewel)
-    {
-        if (isJewel)
-            _jewelChangedCallback += jewelChangedCallback;
-        else
-            _jewelChangedCallback -= jewelChangedCallback;
-    }
+
     #endregion
 
     #region MVVM Refresh / Request
+
     public void RefreshPlayerInfo(Action<UserDetails> callback)
     {
         if (_userDetails != null)
@@ -100,18 +149,21 @@ public class DataBaseManager : MonoBehaviour
             callback.Invoke(_userDetails);
         }
     }
+    public void RefreshPlayerInfo(Action<UserGoods> callback)
+    {
+        if (_userGoods != null)
+        {
+            callback.Invoke(_userGoods);
+        }
+    }
 
+
+    #region MVVM Details
     public void RequestLevelUp()
     {
         _userDetails.LEVEL += 1;
         StartCoroutine(UpdateUserDetails("LEVEL", _userDetails.LEVEL, _userDetails.USER_ID));
         _levelUpCallback?.Invoke(_userDetails.LEVEL);
-    }
-
-    public void RequestGoldChange(int addGold)
-    {
-        _userDetails.GOLD += addGold;
-        _goldChangedCallback?.Invoke(_userDetails.GOLD);
     }
 
     public void RequestExpGain(int exp)
@@ -131,18 +183,77 @@ public class DataBaseManager : MonoBehaviour
         }
     }
 
+    #endregion MVVM Details
+
+
+    
+    #region MVVM Goods
+
+    public void RequestGoodsChange(UserGoodsType goodsType, int value)
+    {
+        switch(goodsType)
+        {
+            case UserGoodsType.GOLD:
+                _userGoods.GOLD += value;
+                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.GOLD, _userDetails.USER_ID));
+                _goldChangedCallback?.Invoke(goodsType, _userGoods.GOLD);
+                break;
+            case UserGoodsType.JEWEL:
+                _userGoods.JEWEL += value;
+                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.JEWEL, _userDetails.USER_ID));
+                _goldChangedCallback?.Invoke(goodsType, _userGoods.JEWEL);
+                break;
+            case UserGoodsType.TICKET_WEAPON:
+                _userGoods.TICKET_WEAPON += value;
+                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.TICKET_WEAPON, _userDetails.USER_ID));
+                _goldChangedCallback?.Invoke(goodsType, _userGoods.TICKET_WEAPON);
+                break;
+            case UserGoodsType.TICKET_ARMOR:
+            _userGoods.TICKET_ARMOR += value;
+                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.TICKET_ARMOR, _userDetails.USER_ID));
+                _goldChangedCallback?.Invoke(goodsType, _userGoods.TICKET_ARMOR);
+                break;
+        }
+        
+        //StartCoroutine(UpdateUserGoods(goodsType, _userGoods.GOLD, _userDetails.USER_ID));
+        
+    }
+
+    /*// 타입을 하나 더 받아서 
+    public void RequestGoldChange(int addGold)
+    {
+        _userGoods.GOLD += addGold;
+        StartCoroutine(UpdateUserGoods(UserGoodsType.GOLD, _userGoods.GOLD, _userDetails.USER_ID));
+        _goldChangedCallback?.Invoke(_userGoods.GOLD);
+    }
+
     public void RequestJewelChange(int jewel)
     {
-        _userDetails.JEWEL += jewel;
-        _jewelChangedCallback?.Invoke(_userDetails.JEWEL);
+        _userGoods.JEWEL += jewel;
+        StartCoroutine(UpdateUserGoods(UserGoodsType.GOLD, _userGoods.JEWEL, _userDetails.USER_ID));
+        _jewelChangedCallback?.Invoke(_userGoods.JEWEL);
     }
-    #endregion
+
+    public void RequestTicketWeaponChange(int jewel)
+    {
+        _userGoods.JEWEL += jewel;
+        _jewelChangedCallback?.Invoke(_userGoods.JEWEL);
+    }
+
+    public void RequestTicketArmorChange(int jewel)
+    {
+        _userGoods.JEWEL += jewel;
+        _jewelChangedCallback?.Invoke(_userGoods.JEWEL);
+    }*/
+
+    #endregion MVVM Goods
+
+    #endregion MVVM Refresh / Request
 
     #region Login Event
-    public LoginResponse RequestLogin(string username, string password)
+    public void RequestLogin(string username, string password)
     {
         StartCoroutine(Login(username, password));
-        return login_feedback;
     }
 
     IEnumerator Login(string username, string password)
@@ -160,7 +271,6 @@ public class DataBaseManager : MonoBehaviour
             {
                 login_feedback.message = "Error: " + www.error;
                 login_feedback.success = false;
-
             }
             else
             {
@@ -170,10 +280,17 @@ public class DataBaseManager : MonoBehaviour
                 {
                     login_feedback.message = "Login successful!";
                     login_feedback.success = true;
+
+                    // Data Load
                     InitUserDetails(loginResponse.userDetails);
-                    _loginCountMonth = loginResponse.loginCountMonth; // Save the login count month
-                    _isFirstLogin = loginResponse.isFirstLogin; // Save isFirstLogin status
+                    InitUserGoods(loginResponse.userGoods);
+                    _loginCountMonth = loginResponse.loginCountMonth;
+                    _isFirstLogin = loginResponse.isFirstLogin;
                     _loginCallback?.Invoke(loginResponse.userDetails.USER_ID, loginResponse.userDetails.LEVEL);
+
+                    // Game Scene Change.
+                    outGameView.OnDisable_Login();
+                    inGameView.OnStart_GameUI();
                 }
                 else
                 {
@@ -183,6 +300,7 @@ public class DataBaseManager : MonoBehaviour
             }
         }
     }
+
 
     IEnumerator UpdateUserDetails(string column, int value, int userId)
     {
@@ -208,17 +326,13 @@ public class DataBaseManager : MonoBehaviour
         }
     }
 
-    public void OnClick_UpdateUserGoods(string column, int value)
-    {
-         StartCoroutine(UpdateUserGoods(column, value, _userDetails.USER_ID));
-    }
-
-    IEnumerator UpdateUserGoods(string column, int value, int userId)
+    IEnumerator UpdateUserGoods(UserGoodsType column, int value, int userId)
     {
         string url = "http://localhost:3000/updateUserGoods";
         WWWForm form = new WWWForm();
+
         form.AddField("userId", userId);
-        form.AddField("column", column);
+        form.AddField("column", column.ToString()); //nameof 체크할 것.
         form.AddField("value", value);
 
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
@@ -227,13 +341,13 @@ public class DataBaseManager : MonoBehaviour
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
-                login_feedback.message = "Error: " + www.error;
-                login_feedback.success = false;
+                goods_feedback.message = "Error: " + www.error;
+                goods_feedback.success = false;
             }
             else
             {
+                login_feedback.success = true;
                 ProcessUserGoodsResponse(www.downloadHandler.text);
-                Invoke("", 0.5f);
             }
         }
     }
@@ -242,6 +356,11 @@ public class DataBaseManager : MonoBehaviour
     {
         _userDetails = userDetails;
     }
+    void InitUserGoods(UserGoods userGoods)
+    {
+        _userGoods = userGoods;
+    }
+
 
     void ProcessUserDetailsResponse(string response)
     {
@@ -260,17 +379,21 @@ public class DataBaseManager : MonoBehaviour
 
     void ProcessUserGoodsResponse(string response)
     {
-        UserGoodsResponse userDetailsResponse = JsonUtility.FromJson<UserGoodsResponse>(response);
+        UserGoodsResponse userGoodsResponse = JsonUtility.FromJson<UserGoodsResponse>(response);
 
-        if (userDetailsResponse.success)
+        if (userGoodsResponse.success)
         {
-            login_feedback.message = "User goods retrieved successfully!";
+            goods_feedback.message = "User goods retrieved successfully!";
+            InitUserGoods(userGoodsResponse.userGoods);
         }
         else
         {
-            login_feedback.message = "Failed to retrieve user goods: " + userDetailsResponse.message;
+            goods_feedback.message = "Failed to retrieve user goods: " + userGoodsResponse.message;
         }
     }
+
+    
+
 
     #endregion
 }
@@ -281,6 +404,7 @@ public class LoginResponse
     public bool success;
     public string message;
     public UserDetails userDetails;
+    public UserGoods userGoods;
     public int loginCountMonth;
     public bool isFirstLogin; // Add this field to store isFirstLogin status
 }
@@ -298,8 +422,8 @@ public class UserGoodsResponse
 {
     public bool success;
     public string message;
+    public UserGoods userGoods;
 }
-
 
 [System.Serializable]
 public class UserDetails
@@ -308,7 +432,17 @@ public class UserDetails
     public string NICKNAME;
     public int LEVEL;
     public int EXPERIENCE;
-    public int GOLD;
-    public int JEWEL;
+    public int SKILL_POINT;
     public string INVENTORY;
 }
+
+[System.Serializable]
+public class UserGoods
+{
+    public int USER_ID;
+    public int GOLD;
+    public int JEWEL;
+    public int TICKET_WEAPON;
+    public int TICKET_ARMOR;
+}
+

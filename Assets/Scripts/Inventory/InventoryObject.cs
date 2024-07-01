@@ -17,7 +17,7 @@ public class InventoryObject : ScriptableObject
     {
         for (int i = 0; i < Container.Items.Length; i++)
         {
-            if (Container.Items[i].item.itemKey.ItemID == _item.itemKey.ItemID)
+            if (Container.Items[i].item.ItemID == _item.ItemID)
             {
                 Container.Items[i].AddAmount(_amount);
                 return;
@@ -30,7 +30,7 @@ public class InventoryObject : ScriptableObject
     {
         for (int i = 0; i < Container.Items.Length; i++)
         {
-            if (Container.Items[i].item.itemKey.ItemID <= 0)
+            if (Container.Items[i].item.ItemID <= 0)
             {
                 Container.Items[i].UpdateSlot(_item, _amount);
                 return Container.Items[i];

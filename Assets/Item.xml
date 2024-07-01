@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Item>
   <dataCategory>
-    <data ItemType="Weapon" ItemID="1" ItemName="Sword" Icon="icon_sword-pirate_LP" Description="검이다." />
-    <data ItemType="Weapon" ItemID="2" ItemName="Blade" Icon="icon_katana_LP" Description="이름이 블레이드지만 사실 카타나다." />
-    <data ItemType="Weapon" ItemID="3" ItemName="Dagger" Icon="icon_knife_LP" Description="대거" />
-    <data ItemType="Weapon" ItemID="4" ItemName="axe" Icon="icon_axe_LP" Description="X" />
-    <data ItemType="Weapon" ItemID="5" ItemName="hammer" Icon="icon_baseball-bat-nails_LP" Description="해머인척하는 몽둥이" />
-    <data ItemType="Weapon" ItemID="6" ItemName="spear" Icon="icon_pickaxe_LP" Description="창인척하는 곡괭이" />
-    <data ItemType="Weapon" ItemID="7" ItemName="bow" Icon="icon_bow_LP" Description="활" />
-    <data ItemType="Weapon" ItemID="8" ItemName="staff" Icon="icon_baseball-bat_LP" Description="이 야구배트는 사실 스태프기능을 들고있다." />
-    <data ItemType="Weapon" ItemID="9" ItemName="wand" Icon="icon_broom_LP" Description="빗자루(완드)" />
-    <data ItemType="Weapon" ItemID="10" ItemName="saber" Icon="icon_shovel_LP" Description="세상을 구하는 건 한 자루의 삽이였다." />
-    <data ItemType="Armor" ItemID="1" ItemName="헬멧" Icon="icon_knight-head_LP" Description="헬멧이다." />
-    <data ItemType="Armor" ItemID="2" ItemName="갑옷" Icon="icon_clothes-medieval-fashion_LP" Description="갑옷이다" />
-    <data ItemType="Armor" ItemID="3" ItemName="장갑" Icon="icon_waving_LP" Description="장갑이다" />
-    <data ItemType="Armor" ItemID="4" ItemName="신발" Icon="icon_letter-T_LP" Description="신발이다" />
-    <data ItemType="Goods" ItemID="1" ItemName="골드" Icon="icon_coin-crown-gold_LP" Description="골드이다." />
-    <data ItemType="Goods" ItemID="2" ItemName="쥬얼" Icon="icon_gem-blue_LP" Description="쥬얼이다." />
-    <data ItemType="Goods" ItemID="3" ItemName="무기소환권" Icon="icon_book_LP" Description="무기소환권이다." />
-    <data ItemType="Goods" ItemID="4" ItemName="방어구소환권" Icon="icon_paper-old_LP" Description="방어구소환권이다." />
+    <data ClassName="Weapon_1" ItemType="Weapon" ItemID="1" ItemName="Sword" Icon="icon_sword-pirate_LP" Description="검이다." />
+    <data ClassName="Weapon_2" ItemType="Weapon" ItemID="2" ItemName="Blade" Icon="icon_katana_LP" Description="이름이 블레이드지만 사실 카타나다." />
+    <data ClassName="Weapon_3" ItemType="Weapon" ItemID="3" ItemName="Dagger" Icon="icon_knife_LP" Description="대거" />
+    <data ClassName="Weapon_4" ItemType="Weapon" ItemID="4" ItemName="axe" Icon="icon_axe_LP" Description="X" />
+    <data ClassName="Weapon_5" ItemType="Weapon" ItemID="5" ItemName="hammer" Icon="icon_baseball-bat-nails_LP" Description="해머인척하는 몽둥이" />
+    <data ClassName="Weapon_6" ItemType="Weapon" ItemID="6" ItemName="spear" Icon="icon_pickaxe_LP" Description="창인척하는 곡괭이" />
+    <data ClassName="Weapon_7" ItemType="Weapon" ItemID="7" ItemName="bow" Icon="icon_bow_LP" Description="활" />
+    <data ClassName="Weapon_8" ItemType="Weapon" ItemID="8" ItemName="staff" Icon="icon_baseball-bat_LP" Description="이 야구배트는 사실 스태프기능을 들고있다." />
+    <data ClassName="Weapon_9" ItemType="Weapon" ItemID="9" ItemName="wand" Icon="icon_broom_LP" Description="빗자루(완드)" />
+    <data ClassName="Weapon_10" ItemType="Weapon" ItemID="10" ItemName="saber" Icon="icon_shovel_LP" Description="세상을 구하는 건 한 자루의 삽이였다." />
+    <data ClassName="Armor_Helmet" ItemType="Armor" ItemID="1" ItemName="헬멧" Icon="icon_knight-head_LP" Description="헬멧이다." />
+    <data ClassName="Armor_Clothes" ItemType="Armor" ItemID="2" ItemName="갑옷" Icon="icon_clothes-medieval-fashion_LP" Description="갑옷이다" />
+    <data ClassName="Armor_Hand" ItemType="Armor" ItemID="3" ItemName="장갑" Icon="icon_waving_LP" Description="장갑이다" />
+    <data ClassName="Armor_Shoes" ItemType="Armor" ItemID="4" ItemName="신발" Icon="icon_letter-T_LP" Description="신발이다" />
+    <data ClassName="GOLD" ItemType="Goods" ItemID="5" ItemName="골드" Icon="icon_coin-crown-gold_LP" Description="골드이다." />
+    <data ClassName="JEWEL" ItemType="Goods" ItemID="6" ItemName="쥬얼" Icon="icon_gem-blue_LP" Description="쥬얼이다." />
+    <data ClassName="TICKET_WEAPON" ItemType="Goods" ItemID="7" ItemName="무기소환권" Icon="icon_book_LP" Description="무기소환권이다." />
+    <data ClassName="TICKET_ARMOR" ItemType="Goods" ItemID="8" ItemName="방어구소환권" Icon="icon_paper-old_LP" Description="방어구소환권이다." />
   </dataCategory>
 </Item>

@@ -1,5 +1,3 @@
-using UnityEngine.TextCore.Text;
-
 public static class PlayerInfoExtentions
 {
     /// <summary>
@@ -16,7 +14,6 @@ public static class PlayerInfoExtentions
         vm.Name = userDetails.NICKNAME;
         vm.Level = userDetails.LEVEL;
         vm.Exp = userDetails.EXPERIENCE;
-
     }
     public static void RegisterEventsOnEnable_PlayerInfo(this PlayerInfoViewModel vm, bool isEventEnable)
     {
@@ -36,6 +33,7 @@ public static class PlayerInfoExtentions
 
     public static void RegisterEventsOnEnable(this PlayerInfoViewModel vm, bool isEventEnable)
     {
+        //DataBaseManager.Inst.RegisterNameChangeCallback(vm.OnResponseNameChangedEvent, isEventEnable);
         DataBaseManager.Inst.RegisterExpUpCallback(vm.OnResponseExpChangedEvent, isEventEnable);
         DataBaseManager.Inst.RegisterLevelUpCallback(vm.OnResponseLevelChangedEvent, isEventEnable);
     }
@@ -51,7 +49,7 @@ public static class PlayerInfoExtentions
     {
         DataBaseManager.Inst.RefreshPlayerInfo(vm.OnRefreshViewModel_PlayerInfo);
     }
-    public static void OnRefreshViewModel_PlayerInfo(this GoodsViewModel vm, UserDetails userDetails)
+    public static void OnRefreshViewModel_PlayerInfo(this GoodsViewModel vm, UserGoods userDetails)
     {
         vm.Gold = userDetails.GOLD;
         vm.Jewel = userDetails.JEWEL;
@@ -59,18 +57,25 @@ public static class PlayerInfoExtentions
 
     public static void RegisterEventsOnEnable_Goods(this GoodsViewModel vm, bool isEventEnable)
     {
-        DataBaseManager.Inst.RegisterGoldChangedCallback(vm.OnResponseGoldChangedEvent, isEventEnable);
-        DataBaseManager.Inst.RegisterJewelChangedCallback(vm.OnResponseJewelChangedEvent, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.GOLD, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.JEWEL, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.TICKET_WEAPON, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.TICKET_ARMOR, isEventEnable);
     }
 
-    public static void OnResponseGoldChangedEvent(this GoodsViewModel vm, int gold)
+    public static void OnResponse_GoodsChangedEvent(this GoodsViewModel vm, UserGoodsType type, int value)
     {
-        vm.Gold = gold;
-    }
-
-    public static void OnResponseJewelChangedEvent(this GoodsViewModel vm, int jewel)
-    {
-        vm.Jewel = jewel;
+        switch(type)
+        {
+            case UserGoodsType.GOLD: 
+                vm.Gold = value; break;
+            case UserGoodsType.JEWEL: 
+                vm.Jewel = value; break;
+            case UserGoodsType.TICKET_WEAPON: 
+                vm.Ticket_Weapon = value; break;
+            case UserGoodsType.TICKET_ARMOR: 
+                vm.Ticket_Armor = value; break;
+        }
     }
 
     #endregion
@@ -79,8 +84,12 @@ public static class PlayerInfoExtentions
     public static Levels GetPlayerDetailData(this GameDataManager manager, int level)
     {
         var levelInfoList = manager.LevelInfoList;
-        if (levelInfoList.Count == 0
-            || levelInfoList.ContainsKey(level) == false)
+
+        if (levelInfoList == null)
+        {
+            return null;
+        }
+        else if(levelInfoList.Count == 0 || levelInfoList.ContainsKey(level) == false)
         {
             return null;
         }

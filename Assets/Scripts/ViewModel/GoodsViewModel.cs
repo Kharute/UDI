@@ -7,6 +7,8 @@ public class GoodsViewModel : ViewModelBase
 {
     private int _gold;
     private int _jewel;
+    private int _ticket_weapon;
+    private int _ticket_armor;
 
     public int Gold
     {
@@ -33,4 +35,29 @@ public class GoodsViewModel : ViewModelBase
             OnPropertyChanged(nameof(Jewel));
         }
     }
+    public int Ticket_Weapon
+    {
+        get { return _ticket_weapon; }
+        set
+        {
+            if (_ticket_weapon == value)
+                return;
+
+            _ticket_weapon = value;
+            OnPropertyChanged(nameof(Ticket_Weapon));
+        }
+    }
+    public int Ticket_Armor
+    {
+        get { return _ticket_armor; }
+        set
+        {
+            if (_ticket_armor == value)
+                return;
+
+            _ticket_armor = value;
+            OnPropertyChanged(nameof(Ticket_Armor));
+        }
+    }
+
 }

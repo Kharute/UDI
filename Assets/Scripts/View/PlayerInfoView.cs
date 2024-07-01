@@ -25,7 +25,6 @@ public class PlayerInfoView : MonoBehaviour
             _vm.PropertyChanged += OnPropertyChanged;
             _vm.RegisterEventsOnEnable(true); //true면 이벤트 ON, false면 이벤트 OFF
             _vm.RefreshViewModel_PlayerInfo();
-            
         }
     }
 
@@ -43,13 +42,15 @@ public class PlayerInfoView : MonoBehaviour
     {
         var _detailData = GameDataManager.Inst.GetPlayerDetailData(_vm.Level);
 
+        if (nameof(_vm.Name) == e.PropertyName)
+        {
+            TextMesh_Name.text = _vm.Name;
+        }
+
         if (_detailData != null)
         {
             switch (e.PropertyName)
             {
-                case nameof(_vm.Name):
-                    TextMesh_Name.text = _vm.Name;
-                    break;
                 case nameof(_vm.Level):
                     TextMesh_level.text = _vm.Level.ToString();
                     if (Slider_exp != null)

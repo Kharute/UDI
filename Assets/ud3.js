@@ -21,6 +21,7 @@ db.connect((err) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.post('/login', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -29,48 +30,47 @@ app.post('/login', (req, res) => {
         return res.json({ success: false, message: 'Please provide username and password' });
     }
 
-    const query = 'SELECT USER_ID, LOGIN_COUNT_MONTH, LOGIN_ISFIRST FROM USER_LOGIN WHERE username = ? AND password = ?';
+    const query = 'SELECT USER_ID, LOGIN_COUNT_MONTH, LOGIN_ISFIRST, LOGIN_DATE FROM USER_LOGIN WHERE user_name = ? AND password = ?';
     db.query(query, [username, password], (err, results) => {
         if (err) {
-            return res.json({ success: false, message: 'Database query error' });
+            return res.json({ success: false, message: 'Database query error to login' });
         }
 
         if (results.length > 0) {
             const userId = results[0].USER_ID;
-            const loginCountMonth = results[0].LOGIN_COUNT_MONTH;
+            let loginCountMonth = results[0].LOGIN_COUNT_MONTH;
             let loginIsFirst = false;
+            const lastLoginDate = results[0].LOGIN_DATE ? new Date(results[0].LOGIN_DATE) : null;
             const currentTime = new Date();
             const currentHour = currentTime.getHours();
 
-            // 로그인 시간 업데이트 쿼리
-            const updateLoginTimeQuery = 'UPDATE USER_LOGIN SET LOGIN_TIME = ? WHERE USER_ID = ?';
-            
-            // 트랜잭션 시작
+            const updateLoginTimeQuery = 'UPDATE USER_LOGIN SET LOGIN_TIME = ?, LOGIN_DATE = ? WHERE USER_ID = ?';
             db.beginTransaction(transactionErr => {
                 if (transactionErr) {
                     return res.json({ success: false, message: 'Failed to start transaction' });
                 }
 
-                // 로그인 시간 업데이트
-                db.query(updateLoginTimeQuery, [currentTime, userId], (updateTimeErr, updateTimeResults) => {
+                db.query(updateLoginTimeQuery, [currentTime, currentTime, userId], (updateTimeErr, updateTimeResults) => {
                     if (updateTimeErr) {
                         return db.rollback(() => {
                             res.json({ success: false, message: 'Failed to update login time' });
                         });
                     }
 
-                    let newLoginCountMonth = loginCountMonth;
+                    // Check if the month has changed
+                    if (lastLoginDate && (lastLoginDate.getMonth() !== currentTime.getMonth() || lastLoginDate.getFullYear() !== currentTime.getFullYear())) {
+                        loginCountMonth = 0;
+                    }
 
-                    // 오전 6시 기준으로 로그인 회수 증가
-                    if (currentHour >= 6) {
-                        const incrementLoginCountQuery = 'UPDATE USER_LOGIN SET LOGIN_COUNT_MONTH = LOGIN_COUNT_MONTH + 1, LOGIN_ISFIRST = 1 WHERE USER_ID = ?';
-                        db.query(incrementLoginCountQuery, [userId], (incrementCountErr, incrementCountResults) => {
+                    if (currentHour >= 6 && (!lastLoginDate || lastLoginDate.toDateString() !== currentTime.toDateString())) {
+                        const incrementLoginCountQuery = 'UPDATE USER_LOGIN SET LOGIN_COUNT_MONTH = ?, LOGIN_ISFIRST = 1 WHERE USER_ID = ?';
+                        db.query(incrementLoginCountQuery, [loginCountMonth + 1, userId], (incrementCountErr, incrementCountResults) => {
                             if (incrementCountErr) {
                                 return db.rollback(() => {
                                     res.json({ success: false, message: 'Failed to increment login count' });
                                 });
                             }
-                            newLoginCountMonth += 1;
+                            loginCountMonth += 1;
                             loginIsFirst = true;
 
                             const detailsQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
@@ -92,7 +92,7 @@ app.post('/login', (req, res) => {
                                         success: true, 
                                         message: 'Login successful, login time updated, and login count incremented', 
                                         userDetails: detailsResults[0],
-                                        loginCountMonth: newLoginCountMonth,
+                                        loginCountMonth: loginCountMonth,
                                         loginIsFirst: loginIsFirst 
                                     });
                                 });
@@ -118,7 +118,7 @@ app.post('/login', (req, res) => {
                                     success: true, 
                                     message: 'Login successful and login time updated', 
                                     userDetails: detailsResults[0],
-                                    loginCountMonth: newLoginCountMonth,
+                                    loginCountMonth: loginCountMonth,
                                     loginIsFirst: loginIsFirst 
                                 });
                             });
@@ -132,94 +132,148 @@ app.post('/login', (req, res) => {
     });
 });
 
-// 새로운 사용자 세부 정보 생성 또는 조회 엔드포인트
 app.post('/createUserDetails', (req, res) => {
     const { userId } = req.body;
 
-    const checkQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
-    db.query(checkQuery, [userId], (checkErr, checkResults) => {
-        if (checkErr) {
-            return res.json({ success: false, message: 'Database query error' });
+    const checkUserDetailsQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
+    const checkUserGoodsQuery = 'SELECT * FROM USER_ITEM_GOODS WHERE USER_ID = ?';
+
+    db.beginTransaction(transactionErr => {
+        if (transactionErr) {
+            return res.json({ success: false, message: 'Failed to start transaction' });
         }
 
-        if (checkResults.length > 0) {
-            // 유저 정보가 이미 존재할 경우
-            res.json({ success: true, message: 'User details found', userDetails: checkResults[0] });
-        } else {
-            // 유저 정보가 없을 경우
-            const insertQuery = 'INSERT INTO USER_DETAILS (USER_ID, NICKNAME, LEVEL, EXPERIENCE, GOLD, JEWEL, INVENTORY) VALUES (?, "NONAME", 1, 0, 0, 0, "")';
-            db.query(insertQuery, [userId], (insertErr, insertResults) => {
-                if (insertErr) {
-                    return res.json({ success: false, message: 'Failed to create user details' });
+        db.query(checkUserDetailsQuery, [userId], (checkUserDetailsErr, checkUserDetailsResults) => {
+            if (checkUserDetailsErr) {
+                return db.rollback(() => {
+                    res.json({ success: false, message: 'Database query error to create detail Query' });
+                });
+            }
+
+            db.query(checkUserGoodsQuery, [userId], (checkUserGoodsErr, checkUserGoodsResults) => {
+                if (checkUserGoodsErr) {
+                    return db.rollback(() => {
+                        res.json({ success: false, message: 'Database query error create goods Query' });
+                    });
                 }
 
-                const newDetailsQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
-                db.query(newDetailsQuery, [userId], (newDetailsErr, newDetailsResults) => {
-                    if (newDetailsErr) {
-                        return res.json({ success: false, message: 'Failed to retrieve newly created user details' });
+                const userDetailsExists = checkUserDetailsResults.length > 0;
+                const userGoodsExists = checkUserGoodsResults.length > 0;
+
+                const insertUserDetailsQuery = 'INSERT INTO USER_DETAILS (USER_ID, NICKNAME, LEVEL, EXPERIENCE, INVENTORY) VALUES (?, "NONAME", 1, 0, "")';
+                const insertUserGoodsQuery = 'INSERT INTO USER_ITEM_GOODS (USER_ID, GOLD, JEWEL, TICKET_WEAPON, TICKET_ARMOR) VALUES (?, 0, 0, 0, 0)';
+
+                const queries = [];
+
+                if (!userDetailsExists) {
+                    queries.push({
+                        query: insertUserDetailsQuery,
+                        params: [userId]
+                    });
+                }
+
+                if (!userGoodsExists) {
+                    queries.push({
+                        query: insertUserGoodsQuery,
+                        params: [userId]
+                    });
+                }
+
+                if (queries.length === 0) {
+                    return db.commit(commitErr => {
+                        if (commitErr) {
+                            return db.rollback(() => {
+                                res.json({ success: false, message: 'Failed to commit transaction' });
+                            });
+                        }
+                        res.json({ success: true, message: 'User details and item goods already exist' });
+                    });
+                }
+
+                const executeQueries = (index = 0) => {
+                    if (index >= queries.length) {
+                        return db.commit(commitErr => {
+                            if (commitErr) {
+                                return db.rollback(() => {
+                                    res.json({ success: false, message: 'Failed to commit transaction' });
+                                });
+                            }
+                            res.json({ success: true, message: 'User details and/or item goods created successfully' });
+                        });
                     }
 
-                    res.json({ success: true, message: 'User details created successfully', userDetails: newDetailsResults[0] });
-                });
+                    const { query, params } = queries[index];
+                    db.query(query, params, (err, results) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                res.json({ success: false, message: 'Failed to execute query' });
+                            });
+                        }
+                        executeQueries(index + 1);
+                    });
+                };
+
+                executeQueries();
             });
-        }
+        });
     });
 });
 
-// 허용된 컬럼 이름을 설정 (SQL 인젝션 방지용)
-const allowedColumns = ['LEVEL', 'EXPERIENCE', 'GOLD', 'JEWEL']; // 실제 사용 중인 컬럼명 리스트
+const detailsColumns = ['LEVEL', 'EXPERIENCE', 'SKILL_POINT'];
 
-// 업데이트 엔드포인트
 app.post('/updateUserDetails', (req, res) => {
     const { userId, column, value } = req.body;
 
-    // 컬럼이 허용된 목록에 있는지 확인
-    if (!allowedColumns.includes(column)) {
+    if (!detailsColumns.includes(column)) {
         return res.status(400).json({ error: 'Invalid column name' });
     }
 
     const checkQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
     db.query(checkQuery, [userId], (checkErr, checkResults) => {
         if (checkErr) {
-            return res.json({ success: false, message: 'Database query error' });
-        
-        } else {
-            const query = `UPDATE USER_DETAILS SET ?? = ? WHERE USER_ID = ?`; // SQL 업데이트 쿼리
-
-            db.query(query, [column, value, userId], (err, result) => {
-                if (err) {
-                    return res.json({ success: false, message: 'Failed to update user details' });
-                }
-                res.json({ message: 'Update successful', result });
-            });
+            return res.json({ success: false, message: 'Database query error update detail Query' });
         }
+
+        if (checkResults.length === 0) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        const query = `UPDATE USER_DETAILS SET ${mysql.escapeId(column)} = ? WHERE USER_ID = ?`;
+        db.query(query, [value, userId], (err, result) => {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to update user details' });
+            }
+            res.json({ message: 'Update successful', result });
+        });
     });
 });
 
-// 
+const goodsColumns = ['GOLD', 'JEWEL', 'TICKET_WEAPON', 'TICKET_ARMOR'];
+
 app.post('/updateUserGoods', (req, res) => {
     const { userId, column, value } = req.body;
 
-    // 컬럼이 허용된 목록에 있는지 확인
-    if (!allowedColumns.includes(column)) {
+    if (!goodsColumns.includes(column)) {
         return res.status(400).json({ error: 'Invalid column name' });
     }
 
     const checkQuery = 'SELECT * FROM USER_ITEM_GOODS WHERE USER_ID = ?';
     db.query(checkQuery, [userId], (checkErr, checkResults) => {
         if (checkErr) {
-            return res.json({ success: false, message: 'Database query error' });
-        
-        } else {
-            const query = `UPDATE USER_ITEM_GOODS SET ?? = ? WHERE USER_ID = ?`; // SQL 업데이트 쿼리
-
-            db.query(query, [column, value, userId], (err, result) => {
-                if (err) {
-                    return res.json({ success: false, message: 'Failed to update user details' });
-                }
-                res.json({ message: 'Update successful', result });
-            });
+            return res.json({ success: false, message: 'Database query error update goods Query' });
         }
+
+        if (checkResults.length === 0) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        const query = `UPDATE USER_ITEM_GOODS SET ${mysql.escapeId(column)} = ? WHERE USER_ID = ?`;
+        db.query(query, [value, userId], (err, result) => {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to update user goods' });
+            }
+            res.json({ message: 'Update successful', result });
+        });
     });
 });
 

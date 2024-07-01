@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Xml.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 
 public enum ItemType
@@ -15,7 +14,7 @@ public enum ItemType
 
 public class GameDataManager : MonoBehaviour
 {
-    public static GameDataManager Inst { get; private set; }
+    public static GameDataManager _instance = null;
 
     // 레벨 관련, 아이템 정보,
     public Dictionary<int, Levels> LevelInfoList { get; private set; }
@@ -24,9 +23,20 @@ public class GameDataManager : MonoBehaviour
 
     private string _dataRootPath;
 
+    public static GameDataManager Inst
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<GameDataManager>();
+            }
+            return _instance;
+        }
+    }
+
     private void Awake()
     {
-        Inst = this;
         _dataRootPath = Application.dataPath;
         ReadAllDataOnAwake();
     }
@@ -109,7 +119,7 @@ public class GameDataManager : MonoBehaviour
         {
             AttendItem attendItemData = new AttendItem();
             attendItemData.Day = int.Parse(data.Attribute(nameof(attendItemData.Day)).Value);
-            attendItemData.ItemID = int.Parse(data.Attribute(nameof(attendItemData.ItemID)).Value);
+            attendItemData.ClassName = data.Attribute(nameof(attendItemData.ClassName)).Value;
             attendItemData.Amount = int.Parse(data.Attribute(nameof(attendItemData.Amount)).Value);
 
             AttendItemInfoList.Add(attendItemData.Day, attendItemData);

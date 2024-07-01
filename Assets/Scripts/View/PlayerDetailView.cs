@@ -18,8 +18,7 @@ public class PlayerDetailView : MonoBehaviour
     {
         level = DataBaseManager.Inst.GetPlayerLevel();
 
-        if (level != 0)
-            SetPlayerDetailInfo(level);
+        if (level != 0) SetPlayerDetailInfo(level);
     }
 
     public void OnButtonClick_PlayerDetailInfo(bool isOpen)

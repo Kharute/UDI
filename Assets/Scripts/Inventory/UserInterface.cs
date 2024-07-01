@@ -12,7 +12,6 @@ public abstract class UserInterface : MonoBehaviour
     public Dictionary<GameObject, AttendItem> itemsDisplayed = new Dictionary<GameObject, AttendItem>();
     void Start()
     {
-        CreateSlots();
         
         /*AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
         AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });*/
@@ -20,6 +19,10 @@ public abstract class UserInterface : MonoBehaviour
 
     private void OnEnable()
     {
+        if(itemsDisplayed.Count <= 0)
+        {
+            CreateSlots();
+        }
         UpdateSlots();
     }
     public abstract void CreateSlots();
