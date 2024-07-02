@@ -4,12 +4,6 @@ public class AttendView : MonoBehaviour
 {
     int login_count;
     bool isAccept = false;
-    DataBaseManager DBM;
-
-    private void Awake()
-    {
-        DBM = DataBaseManager.Inst;
-    }
 
     public void OnClick_Attend(bool isOpen)
     {
@@ -18,10 +12,9 @@ public class AttendView : MonoBehaviour
 
     public void OnClick_AcceptAttend()
     {
-        // ÇØ´ç UI¸¦ ²¨Áà¾ß ÇÔ.
         if (!isAccept)
         {
-            login_count = DBM.GetLoginCountMonth();
+            login_count = DataBaseManager.Inst.GetLoginCountMonth();
             if (login_count > 0)
             {
                 AttendItem attendItem = GameDataManager.Inst.AttendItemInfoList[login_count];
@@ -48,6 +41,7 @@ public class AttendView : MonoBehaviour
                             DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
                             break;
                     }
+                    isAccept = !isAccept;
                 }
             }
         }

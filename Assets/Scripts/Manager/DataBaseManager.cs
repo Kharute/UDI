@@ -10,7 +10,9 @@ public enum UserGoodsType
     TICKET_WEAPON,
     TICKET_ARMOR
 }
-
+/// <summary>
+/// 외부 데이터를 Save/Load 하기 위한 Manager
+/// </summary>
 public class DataBaseManager : MonoBehaviour
 {
     [SerializeField]
@@ -25,10 +27,7 @@ public class DataBaseManager : MonoBehaviour
     private Action<UserDetails> _playerInfoCallback;
     private Action<int> _levelUpCallback;
     private Action<int> _expUpCallback;
-    private Action<UserGoodsType, int> _goldChangedCallback;
-    private Action<UserGoodsType, int> _jewelChangedCallback;
-    private Action<UserGoodsType, int> _ticket_weaponChangedCallback;
-    private Action<UserGoodsType, int> _ticket_armorChangedCallback;
+    private Action<UserGoodsType, int> _goodsChangedCallback;
 
     private UserDetails _userDetails = null;
     private UserGoods _userGoods = null;
@@ -99,15 +98,18 @@ public class DataBaseManager : MonoBehaviour
 
     public void Register_GoodsChangedCallback(Action<UserGoodsType, int> valueChangedCallback, UserGoodsType type, bool value)
     {
-        switch (type)
+        if (value)
+            _goodsChangedCallback += valueChangedCallback;
+        else
+            _goodsChangedCallback -= valueChangedCallback;
+
+
+        /*switch (type)
         {
+
             case UserGoodsType.GOLD:
                 {
-                    if (value)
-                        _goldChangedCallback += valueChangedCallback;
-                    else
-                        _goldChangedCallback -= valueChangedCallback;
-                    break;
+                        break;
                 }
             case UserGoodsType.JEWEL:
                 {
@@ -134,7 +136,7 @@ public class DataBaseManager : MonoBehaviour
                         _ticket_armorChangedCallback -= valueChangedCallback;
                 }
                 break;
-        }
+        }*/
     }
 
 
@@ -194,29 +196,21 @@ public class DataBaseManager : MonoBehaviour
         switch(goodsType)
         {
             case UserGoodsType.GOLD:
-                _userGoods.GOLD += value;
-                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.GOLD, _userDetails.USER_ID));
-                _goldChangedCallback?.Invoke(goodsType, _userGoods.GOLD);
+                value += _userGoods.GOLD;
                 break;
             case UserGoodsType.JEWEL:
-                _userGoods.JEWEL += value;
-                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.JEWEL, _userDetails.USER_ID));
-                _goldChangedCallback?.Invoke(goodsType, _userGoods.JEWEL);
+                value += _userGoods.JEWEL;
                 break;
             case UserGoodsType.TICKET_WEAPON:
-                _userGoods.TICKET_WEAPON += value;
-                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.TICKET_WEAPON, _userDetails.USER_ID));
-                _goldChangedCallback?.Invoke(goodsType, _userGoods.TICKET_WEAPON);
+                value += _userGoods.TICKET_WEAPON;
                 break;
             case UserGoodsType.TICKET_ARMOR:
-            _userGoods.TICKET_ARMOR += value;
-                StartCoroutine(UpdateUserGoods(goodsType, _userGoods.TICKET_ARMOR, _userDetails.USER_ID));
-                _goldChangedCallback?.Invoke(goodsType, _userGoods.TICKET_ARMOR);
+                value += _userGoods.TICKET_ARMOR;
                 break;
         }
-        
-        //StartCoroutine(UpdateUserGoods(goodsType, _userGoods.GOLD, _userDetails.USER_ID));
-        
+
+        StartCoroutine(UpdateUserGoods(goodsType, value, _userDetails.USER_ID));
+        _goodsChangedCallback?.Invoke(goodsType, value);
     }
 
     /*// 타입을 하나 더 받아서 
@@ -300,7 +294,6 @@ public class DataBaseManager : MonoBehaviour
             }
         }
     }
-
 
     IEnumerator UpdateUserDetails(string column, int value, int userId)
     {

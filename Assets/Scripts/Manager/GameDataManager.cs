@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-
 
 public enum ItemType
 {
@@ -12,6 +11,9 @@ public enum ItemType
     Goods
 }
 
+/// <summary>
+/// 인게임 내에서만 다루는 데이터를 불러오는 Manager
+/// </summary>
 public class GameDataManager : MonoBehaviour
 {
     public static GameDataManager _instance = null;
@@ -20,6 +22,8 @@ public class GameDataManager : MonoBehaviour
     public Dictionary<int, Levels> LevelInfoList { get; private set; }
     public Dictionary<string, Item> ItemInfoList { get; private set; }
     public Dictionary<int, AttendItem> AttendItemInfoList { get; private set; }
+    public Dictionary<string, Skill> SkillInfoList { get; private set; }
+    public Dictionary<int, SkillTreeSlot> SkillTreeList { get; private set; }
 
     private string _dataRootPath;
 
@@ -40,12 +44,13 @@ public class GameDataManager : MonoBehaviour
         _dataRootPath = Application.dataPath;
         ReadAllDataOnAwake();
     }
-        
+
     private void ReadAllDataOnAwake()
     {
-        ReadData(nameof(Levels)); // == ReadData("Character")
+        ReadData(nameof(Levels));
         ReadData(nameof(Item));
         ReadData(nameof(AttendItem));
+        ReadData(nameof(Skill));
     }
 
     private void ReadData(string tableName)
@@ -60,6 +65,12 @@ public class GameDataManager : MonoBehaviour
                 break;
             case nameof(AttendItem):
                 ReadAttendItemTable(tableName);
+                break;
+            case nameof(Skill):
+                ReadSkillTable(tableName);
+                break;
+            case nameof(SkillTreeSlot):
+                ReadSkillTreeTable(tableName);
                 break;
         }
     }
@@ -126,6 +137,67 @@ public class GameDataManager : MonoBehaviour
         }
     }
 
+    private void ReadSkillTable(string tableName)
+    {
+        SkillInfoList = new Dictionary<string, Skill>();
+
+        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        var dataElements = doc.Descendants("data");
+
+        foreach (var data in dataElements)
+        {
+            Skill skill;
+
+            string name = data.Attribute(nameof(skill.SkillName)).Value;
+            string description = data.Attribute(nameof(skill.Description)).Value;
+            skill = new Skill(name, description);
+
+            SkillType value = (SkillType)Enum.Parse(typeof(SkillType), data.Attribute(nameof(skill.Type)).Value);
+            skill.Type = value;
+            skill.Value = int.Parse(data.Attribute(nameof(skill.Value)).Value);
+            skill.MaxLevel = int.Parse(data.Attribute(nameof(skill.MaxLevel)).Value);
+            skill.Icon = data.Attribute(nameof(skill.Icon)).Value;
+
+            string skillListStr = data.Attribute(nameof(skill.Prerequisites)).Value;
+            if (!string.IsNullOrEmpty(skillListStr))
+            {
+                skillListStr = skillListStr.Replace("{", string.Empty);
+                skillListStr = skillListStr.Replace("}", string.Empty);
+
+                var names = skillListStr.Split(',');
+
+                if (names.Length > 0)
+                {
+                    foreach (var skillname in names)
+                    {
+                        skill.Prerequisites.Add(new Skill(skillname, ""));
+                    }
+                }
+            }
+            SkillInfoList.Add(skill.SkillName, skill);
+        }
+
+    }
+    private void ReadSkillTreeTable(string tableName)
+    {
+        SkillTreeList = new Dictionary<int, SkillTreeSlot>();
+
+        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        var dataElements = doc.Descendants("data");
+
+        foreach (var data in dataElements)
+        {
+            SkillTreeSlot skillTreeData = new SkillTreeSlot();
+
+            skillTreeData.SkillTreeLevel = int.Parse(data.Attribute(nameof(skillTreeData.SkillTreeLevel)).Value);
+            skillTreeData.minUnlockCount = int.Parse(data.Attribute(nameof(skillTreeData.minUnlockCount)).Value);
+            skillTreeData.SkillNames[0] = data.Attribute($"Slot_1").Value;
+            skillTreeData.SkillNames[1] = data.Attribute($"Slot_2").Value;
+            skillTreeData.SkillNames[2] = data.Attribute($"Slot_3").Value;
+
+            SkillTreeList.Add(skillTreeData.SkillTreeLevel, skillTreeData);
+        }
+    }
     #endregion
 
 }

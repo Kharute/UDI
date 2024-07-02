@@ -10,7 +10,7 @@ public class SkillButton : MonoBehaviour
     public void Initialize(Skill skill)
     {
         this.skill = skill;
-        skillNameText.text = skill.Name;
+        skillNameText.text = skill.SkillName;
         unlockButton.onClick.AddListener(UnlockSkill);
         UpdateButton();
     }

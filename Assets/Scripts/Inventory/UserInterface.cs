@@ -7,15 +7,7 @@ using UnityEngine.Events;
 
 public abstract class UserInterface : MonoBehaviour
 {
-    //public Player player;
-
     public Dictionary<GameObject, AttendItem> itemsDisplayed = new Dictionary<GameObject, AttendItem>();
-    void Start()
-    {
-        
-        /*AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
-        AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });*/
-    }
 
     private void OnEnable()
     {

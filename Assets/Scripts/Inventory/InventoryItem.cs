@@ -57,3 +57,9 @@ public class AttendItem
     public int Amount;
 }
 
+public class SkillTreeSlot
+{
+    public int SkillTreeLevel;
+    public string[] SkillNames;
+    public int minUnlockCount;
+}

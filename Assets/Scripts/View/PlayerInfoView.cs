@@ -2,6 +2,8 @@ using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+
 
 public class PlayerInfoView : MonoBehaviour
 {
@@ -10,9 +12,8 @@ public class PlayerInfoView : MonoBehaviour
     [SerializeField] TextMeshProUGUI TextMesh_Name;
     [SerializeField] TextMeshProUGUI TextMesh_level;
     [SerializeField] TextMeshProUGUI TextMesh_exp;
-    
     [SerializeField] Slider Slider_exp;
-        
+    
     private PlayerInfoViewModel _vm;
 
     //레벨업하면 경험치바도 초기화 해야됨.
