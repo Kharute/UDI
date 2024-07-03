@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using static UnityEditor.Progress;
 [CreateAssetMenu(fileName = "New Inventory Item", menuName = "Inventory/Item")]
@@ -21,6 +22,25 @@ public class Item
     public string ItemName;
     public string Icon;
     public string Description;   
+}
+
+public class Weapon
+{
+    public string ClassName;
+    public int ItemID;
+    public string ItemName;
+    public string Icon;
+    public string Rarity;
+    public string Description;
+}
+
+public class Goods
+{
+    public string ClassName;
+    public int ItemID;
+    public string ItemName;
+    public string Icon;
+    public string Description;
 }
 
 public class ItemKey
@@ -60,6 +80,14 @@ public class AttendItem
 public class SkillTreeSlot
 {
     public int SkillTreeLevel;
-    public string[] SkillNames;
-    public int minUnlockCount;
+    public List<string> SkillNames = new List<string>();
+    public int MinUnlockCount;
+}
+
+public class WeaponSlot
+{
+    public int SkillTreeLevel;
+    public List<string> SkillNames = new List<string>();
+    public int MinUnlockCount;
+
 }

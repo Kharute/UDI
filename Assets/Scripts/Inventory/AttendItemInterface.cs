@@ -14,7 +14,6 @@ public class AttendItemInterface : UserInterface
 
     Dictionary<int, AttendItem> AttendItemInfoList;
 
-
     private void Awake()
     {
         gridLayoutGroup = GetComponent<GridLayoutGroup>();
@@ -41,10 +40,37 @@ public class AttendItemInterface : UserInterface
             AddEvent(obj, EventTriggerType.Drag, delegate { OnDrag(obj); });*//*
         }*/
     }
-    public void AttendSlot()
-    {
 
+    public override void UpdateSlots()
+    {
+        int LoginCount = DataBaseManager.Inst.GetLoginCountMonth();
+        int loginCounts = 0;
+
+        foreach (KeyValuePair<GameObject, AttendItem> _slot in itemsDisplayed)
+        {
+            GameObject IconObj = _slot.Key.transform.GetChild(0).gameObject;
+            GameObject BlerImg = _slot.Key.transform.GetChild(2).gameObject;
+            Image iconImage = IconObj.GetComponent<Image>();
+
+            /*ItemKey itemKey = new ItemKey();
+            itemKey.SetItemKey(_slot.Value.ItemID, ItemType.Goods);*/
+
+            if (GameDataManager.Inst.GoodsItemInfoList != null)
+            {
+                GameDataManager.Inst.GoodsItemInfoList.TryGetValue(_slot.Value.ClassName, out Goods item);
+
+                var path = $"Icons/{item.Icon}";
+                iconImage.sprite = Resources.Load<Sprite>(path);
+
+                iconImage.color = new Color(1, 1, 1, 1);
+                _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = _slot.Value.Amount == 1 ? "" : _slot.Value.Amount.ToString("n0");
+
+                if (loginCounts++ < LoginCount)
+                    BlerImg.SetActive(true);
+                else
+                    BlerImg.SetActive(false);
+            }
+        }
     }
 
-    
 }

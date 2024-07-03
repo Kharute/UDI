@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
@@ -18,39 +16,7 @@ public abstract class UserInterface : MonoBehaviour
         UpdateSlots();
     }
     public abstract void CreateSlots();
-
-    void UpdateSlots()
-    {
-        int LoginCount = DataBaseManager.Inst.GetLoginCountMonth();
-        int loginCounts = 0;
-
-        foreach (KeyValuePair<GameObject, AttendItem> _slot in itemsDisplayed)
-        {
-            GameObject IconObj = _slot.Key.transform.GetChild(0).gameObject;
-            GameObject BlerImg = _slot.Key.transform.GetChild(2).gameObject;
-            Image iconImage = IconObj.GetComponent<Image>();
-
-            /*ItemKey itemKey = new ItemKey();
-            itemKey.SetItemKey(_slot.Value.ItemID, ItemType.Goods);*/
-
-
-            if (GameDataManager.Inst.ItemInfoList != null)
-            {
-                GameDataManager.Inst.ItemInfoList.TryGetValue(_slot.Value.ClassName, out Item item);
-                
-                var path = $"Icons/{item.Icon}";
-                iconImage.sprite = Resources.Load<Sprite>(path);
-                
-                iconImage.color = new Color(1, 1, 1, 1);
-                _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = _slot.Value.Amount == 1 ? "" : _slot.Value.Amount.ToString("n0");
-
-                if (loginCounts++ < LoginCount)
-                    BlerImg.SetActive(true);
-                else
-                    BlerImg.SetActive(false);
-            }
-        }
-    }
+    public abstract void UpdateSlots();
 
     protected void AddEvent(GameObject obj, EventTriggerType type, UnityAction<BaseEventData> action)
     {

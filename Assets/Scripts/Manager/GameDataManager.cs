@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public enum ItemType
 {
@@ -20,10 +21,13 @@ public class GameDataManager : MonoBehaviour
 
     // 레벨 관련, 아이템 정보,
     public Dictionary<int, Levels> LevelInfoList { get; private set; }
-    public Dictionary<string, Item> ItemInfoList { get; private set; }
+    public Dictionary<string, Weapon> WeaponItemList { get; private set; }
+    //public Dictionary<string, Item> ItemInfoList { get; private set; }
+    public Dictionary<string, Goods> GoodsItemInfoList { get; private set; }
     public Dictionary<int, AttendItem> AttendItemInfoList { get; private set; }
     public Dictionary<string, Skill> SkillInfoList { get; private set; }
     public Dictionary<int, SkillTreeSlot> SkillTreeList { get; private set; }
+    public Dictionary<int, WeaponSlot> WeaponSlotList { get; private set; }
 
     private string _dataRootPath;
 
@@ -51,6 +55,7 @@ public class GameDataManager : MonoBehaviour
         ReadData(nameof(Item));
         ReadData(nameof(AttendItem));
         ReadData(nameof(Skill));
+        ReadData(nameof(SkillTreeSlot));
     }
 
     private void ReadData(string tableName)
@@ -99,7 +104,9 @@ public class GameDataManager : MonoBehaviour
 
     private void ReadItemTable(string tableName)
     {
-        ItemInfoList = new Dictionary<string, Item>();
+        WeaponItemList = new Dictionary<string, Weapon>();
+        //ItemInfoList = new Dictionary<string, Item>();
+        GoodsItemInfoList = new Dictionary<string, Goods>();
 
         XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
         var dataElements = doc.Descendants("data");
@@ -107,15 +114,38 @@ public class GameDataManager : MonoBehaviour
         foreach (var data in dataElements)
         {
             Item itemData = new Item();
+            //itemData.ClassName = data.Attribute(nameof(itemData.ClassName)).Value;
+            ItemType itemType = (ItemType)Enum.Parse(typeof(ItemType), data.Attribute(nameof(itemData.ItemType)).Value);
 
-            itemData.ClassName = data.Attribute(nameof(itemData.ClassName)).Value;
-            itemData.ItemID = int.Parse(data.Attribute(nameof(itemData.ItemID)).Value);
-            itemData.ItemType = (ItemType)Enum.Parse(typeof(ItemType), data.Attribute(nameof(itemData.ItemType)).Value);
-            itemData.ItemName = data.Attribute(nameof(itemData.ItemName)).Value;
             itemData.Icon = data.Attribute(nameof(itemData.Icon)).Value;
             itemData.Description = data.Attribute(nameof(itemData.Description)).Value;
 
-            ItemInfoList.Add(itemData.ClassName, itemData);
+            switch(itemType)
+            {
+                case ItemType.Weapon:
+                    Weapon weaponData = new Weapon();
+                    weaponData.ClassName = data.Attribute(nameof(weaponData.ClassName)).Value;
+                    weaponData.ItemID = int.Parse(data.Attribute(nameof(weaponData.ItemID)).Value);
+                    weaponData.ItemName = data.Attribute(nameof(weaponData.ItemName)).Value;
+                    weaponData.Icon = data.Attribute(nameof(weaponData.Icon)).Value;
+                    weaponData.Rarity = data.Attribute(nameof(weaponData.Rarity)).Value;
+                    weaponData.Description = data.Attribute(nameof(weaponData.Description)).Value;
+                    WeaponItemList.Add(weaponData.ClassName, weaponData);
+                    break;
+                case ItemType.Armor:
+                    //ItemInfoList.Add(itemData.ClassName, itemData);
+                    break;
+                case ItemType.Goods:
+                    Goods goodsData = new Goods();
+                    goodsData.ClassName = data.Attribute(nameof(goodsData.ClassName)).Value;
+                    goodsData.ItemID = int.Parse(data.Attribute(nameof(goodsData.ItemID)).Value);
+                    goodsData.ItemName = data.Attribute(nameof(goodsData.ItemName)).Value;
+                    goodsData.Icon = data.Attribute(nameof(goodsData.Icon)).Value;
+                    goodsData.Description = data.Attribute(nameof(goodsData.Description)).Value;
+                    GoodsItemInfoList.Add(goodsData.ClassName, goodsData);
+                    break;
+            }
+            
         }
     }
 
@@ -147,7 +177,6 @@ public class GameDataManager : MonoBehaviour
         foreach (var data in dataElements)
         {
             Skill skill;
-
             string name = data.Attribute(nameof(skill.SkillName)).Value;
             string description = data.Attribute(nameof(skill.Description)).Value;
             skill = new Skill(name, description);
@@ -158,22 +187,6 @@ public class GameDataManager : MonoBehaviour
             skill.MaxLevel = int.Parse(data.Attribute(nameof(skill.MaxLevel)).Value);
             skill.Icon = data.Attribute(nameof(skill.Icon)).Value;
 
-            string skillListStr = data.Attribute(nameof(skill.Prerequisites)).Value;
-            if (!string.IsNullOrEmpty(skillListStr))
-            {
-                skillListStr = skillListStr.Replace("{", string.Empty);
-                skillListStr = skillListStr.Replace("}", string.Empty);
-
-                var names = skillListStr.Split(',');
-
-                if (names.Length > 0)
-                {
-                    foreach (var skillname in names)
-                    {
-                        skill.Prerequisites.Add(new Skill(skillname, ""));
-                    }
-                }
-            }
             SkillInfoList.Add(skill.SkillName, skill);
         }
 
@@ -190,10 +203,16 @@ public class GameDataManager : MonoBehaviour
             SkillTreeSlot skillTreeData = new SkillTreeSlot();
 
             skillTreeData.SkillTreeLevel = int.Parse(data.Attribute(nameof(skillTreeData.SkillTreeLevel)).Value);
-            skillTreeData.minUnlockCount = int.Parse(data.Attribute(nameof(skillTreeData.minUnlockCount)).Value);
-            skillTreeData.SkillNames[0] = data.Attribute($"Slot_1").Value;
-            skillTreeData.SkillNames[1] = data.Attribute($"Slot_2").Value;
-            skillTreeData.SkillNames[2] = data.Attribute($"Slot_3").Value;
+            skillTreeData.MinUnlockCount = int.Parse(data.Attribute(nameof(skillTreeData.MinUnlockCount)).Value);
+
+            for(int i = 0; i < 3; i++)
+            {
+                string inf = $"Slot_{i+1}";
+                if (!string.IsNullOrEmpty(data.Attribute(inf).Value))
+                {
+                    skillTreeData.SkillNames.Add(data.Attribute(inf).Value);
+                }
+            }
 
             SkillTreeList.Add(skillTreeData.SkillTreeLevel, skillTreeData);
         }

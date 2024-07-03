@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SkillTreeSlot>
+  <dataCategory>
+    <data SkillTreeLevel="1" Slot_1="Passive_AtkAdd" Slot_2="Passive_DefAdd" Slot_3="Passive_SpdAdd" MinUnlockCount="1" />
+    <data SkillTreeLevel="2" Slot_1="Passive_AtkAdd" Slot_2="Passive_DefAdd" Slot_3="Passive_SpdAdd" MinUnlockCount="1" />
+    <data SkillTreeLevel="3" Slot_1="Passive_GoldAdd" Slot_2="" Slot_3="" MinUnlockCount="3" />
+    <data SkillTreeLevel="4" Slot_1="Passive_AtkAdd" Slot_2="Passive_DefAdd" Slot_3="Passive_SpdAdd" MinUnlockCount="1" />
+    <data SkillTreeLevel="5" Slot_1="Passive_AtkAdd" Slot_2="Passive_DefAdd" Slot_3="Passive_SpdAdd" MinUnlockCount="1" />
+    <data SkillTreeLevel="6" Slot_1="Passive_GoldAdd" Slot_2="" Slot_3="" MinUnlockCount="3" />
+    <data SkillTreeLevel="7" Slot_1="Passive_AtkAdd" Slot_2="Passive_DefAdd" Slot_3="Passive_SpdAdd" MinUnlockCount="1" />
+    <data SkillTreeLevel="8" Slot_1="Passive_AtkAdd" Slot_2="Passive_DefAdd" Slot_3="Passive_SpdAdd" MinUnlockCount="1" />
+    <data SkillTreeLevel="9" Slot_1="Passive_GoldAdd" Slot_2="" Slot_3="" MinUnlockCount="3" />
+    <data SkillTreeLevel="10" Slot_1="Passive_AtkAdd" Slot_2="Passive_DefAdd" Slot_3="Passive_SpdAdd" MinUnlockCount="1" />
+  </dataCategory>
+</SkillTreeSlot>

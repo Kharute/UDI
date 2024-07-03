@@ -8,6 +8,7 @@ using static UnityEditor.Progress;
 
 public class SkillSlotView : MonoBehaviour
 {
+    [SerializeField] Button Icon_btn;
     [SerializeField] Image Image_Icon;
     [SerializeField] TextMeshProUGUI Text_SkillName;
 

@@ -12,6 +12,7 @@ public class Skill
     public string Description { get; set; }
     public SkillType Type { get; set; }
     public int Value { get; set; }
+    public int LevelPerValue { get; set; }
     public int MaxLevel { get; set; }
     public string Icon { get; set; }
     public bool IsUnlocked { get; set; }
