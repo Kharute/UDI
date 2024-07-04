@@ -21,13 +21,12 @@ public class GameDataManager : MonoBehaviour
 
     // 레벨 관련, 아이템 정보,
     public Dictionary<int, Levels> LevelInfoList { get; private set; }
-    public Dictionary<string, Weapon> WeaponItemList { get; private set; }
-    //public Dictionary<string, Item> ItemInfoList { get; private set; }
+    public Dictionary<int, Weapon> WeaponList { get; private set; }
     public Dictionary<string, Goods> GoodsItemInfoList { get; private set; }
     public Dictionary<int, AttendItem> AttendItemInfoList { get; private set; }
     public Dictionary<string, Skill> SkillInfoList { get; private set; }
     public Dictionary<int, SkillTreeSlot> SkillTreeList { get; private set; }
-    public Dictionary<int, WeaponSlot> WeaponSlotList { get; private set; }
+    public Dictionary<int, WeaponInfo> WeaponInfoList { get; private set; }
 
     private string _dataRootPath;
 
@@ -56,6 +55,7 @@ public class GameDataManager : MonoBehaviour
         ReadData(nameof(AttendItem));
         ReadData(nameof(Skill));
         ReadData(nameof(SkillTreeSlot));
+        ReadData(nameof(WeaponInfo));
     }
 
     private void ReadData(string tableName)
@@ -76,6 +76,9 @@ public class GameDataManager : MonoBehaviour
                 break;
             case nameof(SkillTreeSlot):
                 ReadSkillTreeTable(tableName);
+                break;
+            case nameof(WeaponInfo):
+                ReadWeaponInfoTable(tableName);
                 break;
         }
     }
@@ -104,7 +107,7 @@ public class GameDataManager : MonoBehaviour
 
     private void ReadItemTable(string tableName)
     {
-        WeaponItemList = new Dictionary<string, Weapon>();
+        WeaponList = new Dictionary<int, Weapon>();
         //ItemInfoList = new Dictionary<string, Item>();
         GoodsItemInfoList = new Dictionary<string, Goods>();
 
@@ -124,13 +127,13 @@ public class GameDataManager : MonoBehaviour
             {
                 case ItemType.Weapon:
                     Weapon weaponData = new Weapon();
-                    weaponData.ClassName = data.Attribute(nameof(weaponData.ClassName)).Value;
+                    //weaponData.ClassName = data.Attribute(nameof(weaponData.ClassName)).Value;
                     weaponData.ItemID = int.Parse(data.Attribute(nameof(weaponData.ItemID)).Value);
                     weaponData.ItemName = data.Attribute(nameof(weaponData.ItemName)).Value;
                     weaponData.Icon = data.Attribute(nameof(weaponData.Icon)).Value;
                     weaponData.Rarity = data.Attribute(nameof(weaponData.Rarity)).Value;
                     weaponData.Description = data.Attribute(nameof(weaponData.Description)).Value;
-                    WeaponItemList.Add(weaponData.ClassName, weaponData);
+                    WeaponList.Add(weaponData.ItemID, weaponData);
                     break;
                 case ItemType.Armor:
                     //ItemInfoList.Add(itemData.ClassName, itemData);
@@ -215,6 +218,26 @@ public class GameDataManager : MonoBehaviour
             }
 
             SkillTreeList.Add(skillTreeData.SkillTreeLevel, skillTreeData);
+        }
+    }
+
+    private void ReadWeaponInfoTable(string tableName)
+    {
+        WeaponInfoList = new Dictionary<int, WeaponInfo>();
+
+        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        var dataElements = doc.Descendants("data");
+
+        foreach (var data in dataElements)
+        {
+            WeaponInfo weaponInfoData = new WeaponInfo();
+
+            weaponInfoData.WeaponID = int.Parse(data.Attribute(nameof(weaponInfoData.WeaponID)).Value);
+            weaponInfoData.ItemID = int.Parse(data.Attribute(nameof(weaponInfoData.ItemID)).Value);
+            weaponInfoData.WeaponName = data.Attribute(nameof(weaponInfoData.WeaponName)).Value;
+            weaponInfoData.Tier = int.Parse(data.Attribute(nameof(weaponInfoData.Tier)).Value);
+
+            WeaponInfoList.Add(weaponInfoData.WeaponID, weaponInfoData);
         }
     }
     #endregion

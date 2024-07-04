@@ -18,16 +18,15 @@ namespace ViewModel.Extentions
             return loadedSkillList[dataClassName];
         }
 
-        public static Item GetWeaponData(this GameDataManager manager, int weaponId)
+        public static Weapon GetWeaponData(this GameDataManager manager, int weaponID)
         {
-            /*var loadedItemList = manager.ItemInfoList;
+            var weaponList = manager.WeaponList;
             
-            if (loadedItemList.Count == 0 || loadedItemList.ContainsKey(weaponName) == false)
+            if (weaponList.Count == 0)
             {
                 return null;
-            }*/
-            return null;
-                //loadedItemList[weaponName];
+            }
+            return weaponList[weaponID];
         }
     }
 }

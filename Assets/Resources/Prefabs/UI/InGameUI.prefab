@@ -2941,13 +2941,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5692138876204974781}
     m_Modifications:
+    - target: {fileID: 4368820499146757855, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: Prefab_WeaponSlot
+      value: 
+      objectReference: {fileID: 2735397554768027687, guid: bec4bcf224cdb2f4999a5c9ce4a4dca8, type: 3}
+    - target: {fileID: 4368820499146757855, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: Transform_SlotRoot
+      value: 
+      objectReference: {fileID: 4867971748702009801}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_Pivot.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_RootOrder
@@ -2955,7 +2963,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2963,19 +2971,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 750
+      value: -790
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 400
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3007,11 +3027,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 400.00003
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -200
       objectReference: {fileID: 0}
     - target: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3029,24 +3049,45 @@ PrefabInstance:
       propertyPath: m_Name
       value: Weapon Panel
       objectReference: {fileID: 0}
+    - target: {fileID: 5042257198985260077, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5648026197874218129, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5648026197874218129, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5648026197874218129, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -17
+      objectReference: {fileID: 0}
     - target: {fileID: 5648026199218636607, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: -93
       objectReference: {fileID: 0}
     - target: {fileID: 5648026199218636607, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 116.50015
+      value: 0.000045776367
       objectReference: {fileID: 0}
     - target: {fileID: 5663434783010357105, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5663434783010357105, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+--- !u!1 &4867971748702009801 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5648026199218636604, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
+  m_PrefabInstance: {fileID: 1004112934588382965}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &5194586961568846556 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5042257198985260073, guid: 6ffea51d082345840b393f93a78ae47e, type: 3}
@@ -3105,7 +3146,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8565905882610537144, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: -490
       objectReference: {fileID: 0}
     - target: {fileID: 8565905882610537144, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_SizeDelta.y
@@ -3117,23 +3158,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8565905883339139837, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8565905883339139837, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8565905883954692374, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8565905883954692374, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8565905883954692374, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: -17
       objectReference: {fileID: 0}
     - target: {fileID: 9041070631230450518, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -3154,6 +3195,10 @@ PrefabInstance:
     - target: {fileID: 9041070631390869930, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_Name
       value: Skill Panel
+      objectReference: {fileID: 0}
+    - target: {fileID: 9041070631390869930, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9041070631390869934, guid: b48b149e4f9390f40a06a83e4d8d795e, type: 3}
       propertyPath: m_Pivot.x
@@ -3267,6 +3312,10 @@ PrefabInstance:
     - target: {fileID: 8227508108514378056, guid: 86dcbe198bc4d8f4c933d50df730f65d, type: 3}
       propertyPath: m_Name
       value: Attend Panel
+      objectReference: {fileID: 0}
+    - target: {fileID: 8227508108514378056, guid: 86dcbe198bc4d8f4c933d50df730f65d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8227508108514378059, guid: 86dcbe198bc4d8f4c933d50df730f65d, type: 3}
       propertyPath: m_Pivot.x

@@ -26,7 +26,7 @@ public class Item
 
 public class Weapon
 {
-    public string ClassName;
+    //public string ClassName;
     public int ItemID;
     public string ItemName;
     public string Icon;
@@ -84,10 +84,12 @@ public class SkillTreeSlot
     public int MinUnlockCount;
 }
 
-public class WeaponSlot
+public class WeaponInfo
 {
-    public int SkillTreeLevel;
-    public List<string> SkillNames = new List<string>();
-    public int MinUnlockCount;
+
+    public int WeaponID;
+    public int ItemID;
+    public string WeaponName;
+    public int Tier;
 
 }

@@ -1,6 +1,5 @@
 using DG.Tweening;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponView : MonoBehaviour
@@ -13,8 +12,7 @@ public class WeaponView : MonoBehaviour
 
     #endregion
 
-    [SerializeField] GameObject Prefab_SkillSlot;
-    [SerializeField] GameObject Prefab_HorizontalLayoutGroup;
+    [SerializeField] GameObject Prefab_WeaponSlot;
     [SerializeField] GameObject Transform_SlotRoot;
 
 
@@ -54,23 +52,18 @@ public class WeaponView : MonoBehaviour
 
     private void SetSkillUI()
     {
-        var weaponItemList = GameDataManager.Inst.WeaponItemList;
-        var weaponSlotList = GameDataManager.Inst.WeaponSlotList;
+        var weaponItemList = GameDataManager.Inst.WeaponInfoList;
 
-        if (weaponItemList != null && weaponSlotList != null)
+        if (weaponItemList != null)
         {
-            foreach (var weapon in weaponSlotList)
+            foreach (var weapon in weaponItemList)
             {
-                var weaponSlot = Prefab_SkillSlot.GetComponent<WeaponSlotView>();
-                weaponSlot.SetUI(weapon.Key);
+                var weaponSlots = Prefab_WeaponSlot.GetComponent<WeaponSlotView>();
+                weaponSlots.SetUI(weapon.Value.ItemID);
 
-                Instantiate(weaponSlot, Transform_SlotRoot.transform);
+                Instantiate(Prefab_WeaponSlot, Transform_SlotRoot.transform);
             }
         }
-        /*else
-        {
-            Debug.LogError("skillTreeList, skillInfoList 중 하나가 비었음.");
-        }*/
     }
     #endregion
 }
