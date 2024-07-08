@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public enum UserGoodsType
 {
@@ -31,11 +32,16 @@ public class DataBaseManager : MonoBehaviour
 
     private UserDetails _userDetails = null;
     private UserGoods _userGoods = null;
+    private UserWeapon _userWeapon = null;
+
     private int _loginCountMonth;
     private bool _isFirstLogin;
 
     private LoginResponse login_feedback = new();
     private UserGoodsResponse goods_feedback = new();
+    private UserWeaponResponse weapon_feedback = new();
+
+    public Dictionary<int, int> weapon_CountList;
 
     public static DataBaseManager Inst
     {
@@ -102,41 +108,6 @@ public class DataBaseManager : MonoBehaviour
             _goodsChangedCallback += valueChangedCallback;
         else
             _goodsChangedCallback -= valueChangedCallback;
-
-
-        /*switch (type)
-        {
-
-            case UserGoodsType.GOLD:
-                {
-                        break;
-                }
-            case UserGoodsType.JEWEL:
-                {
-                    if (value)
-                        _jewelChangedCallback += valueChangedCallback;
-                    else
-                        _jewelChangedCallback -= valueChangedCallback;
-                }
-                break;
-            case UserGoodsType.TICKET_WEAPON:
-                {
-                    if (value)
-                        _ticket_weaponChangedCallback += valueChangedCallback;
-                    else
-                        _ticket_weaponChangedCallback -= valueChangedCallback;
-                }
-                break;
-
-            case UserGoodsType.TICKET_ARMOR:
-                {
-                    if (value)
-                        _ticket_armorChangedCallback += valueChangedCallback;
-                    else
-                        _ticket_armorChangedCallback -= valueChangedCallback;
-                }
-                break;
-        }*/
     }
 
 
@@ -158,7 +129,6 @@ public class DataBaseManager : MonoBehaviour
             callback.Invoke(_userGoods);
         }
     }
-
 
     #region MVVM Details
     public void RequestLevelUp()
@@ -187,64 +157,11 @@ public class DataBaseManager : MonoBehaviour
 
     #endregion MVVM Details
 
-
-    
-    #region MVVM Goods
-
-    public void RequestGoodsChange(UserGoodsType goodsType, int value)
-    {
-        switch(goodsType)
-        {
-            case UserGoodsType.GOLD:
-                value += _userGoods.GOLD;
-                break;
-            case UserGoodsType.JEWEL:
-                value += _userGoods.JEWEL;
-                break;
-            case UserGoodsType.TICKET_WEAPON:
-                value += _userGoods.TICKET_WEAPON;
-                break;
-            case UserGoodsType.TICKET_ARMOR:
-                value += _userGoods.TICKET_ARMOR;
-                break;
-        }
-
-        StartCoroutine(UpdateUserGoods(goodsType, value, _userDetails.USER_ID));
-        _goodsChangedCallback?.Invoke(goodsType, value);
-    }
-
-    /*// 타입을 하나 더 받아서 
-    public void RequestGoldChange(int addGold)
-    {
-        _userGoods.GOLD += addGold;
-        StartCoroutine(UpdateUserGoods(UserGoodsType.GOLD, _userGoods.GOLD, _userDetails.USER_ID));
-        _goldChangedCallback?.Invoke(_userGoods.GOLD);
-    }
-
-    public void RequestJewelChange(int jewel)
-    {
-        _userGoods.JEWEL += jewel;
-        StartCoroutine(UpdateUserGoods(UserGoodsType.GOLD, _userGoods.JEWEL, _userDetails.USER_ID));
-        _jewelChangedCallback?.Invoke(_userGoods.JEWEL);
-    }
-
-    public void RequestTicketWeaponChange(int jewel)
-    {
-        _userGoods.JEWEL += jewel;
-        _jewelChangedCallback?.Invoke(_userGoods.JEWEL);
-    }
-
-    public void RequestTicketArmorChange(int jewel)
-    {
-        _userGoods.JEWEL += jewel;
-        _jewelChangedCallback?.Invoke(_userGoods.JEWEL);
-    }*/
-
-    #endregion MVVM Goods
-
     #endregion MVVM Refresh / Request
 
-    #region Login Event
+    #region Database Connection
+
+    #region Login
     public void RequestLogin(string username, string password)
     {
         StartCoroutine(Login(username, password));
@@ -278,6 +195,8 @@ public class DataBaseManager : MonoBehaviour
                     // Data Load
                     InitUserDetails(loginResponse.userDetails);
                     InitUserGoods(loginResponse.userGoods);
+                    RequestLoadWeaponData(loginResponse.userDetails.USER_ID);
+
                     _loginCountMonth = loginResponse.loginCountMonth;
                     _isFirstLogin = loginResponse.isFirstLogin;
                     _loginCallback?.Invoke(loginResponse.userDetails.USER_ID, loginResponse.userDetails.LEVEL);
@@ -294,7 +213,9 @@ public class DataBaseManager : MonoBehaviour
             }
         }
     }
+    #endregion Login
 
+    #region UserDetails
     IEnumerator UpdateUserDetails(string column, int value, int userId)
     {
         string url = "http://localhost:3000/updateUserDetails";
@@ -317,6 +238,52 @@ public class DataBaseManager : MonoBehaviour
                 ProcessUserDetailsResponse(www.downloadHandler.text);
             }
         }
+    }
+
+    void ProcessUserDetailsResponse(string response)
+    {
+        UserDetailsResponse userDetailsResponse = JsonUtility.FromJson<UserDetailsResponse>(response);
+
+        if (userDetailsResponse.success)
+        {
+            login_feedback.message = "User details retrieved successfully!";
+            InitUserDetails(userDetailsResponse.userDetails);
+        }
+        else
+        {
+            login_feedback.message = "Failed to retrieve user details: " + userDetailsResponse.message;
+        }
+    }
+
+    void InitUserDetails(UserDetails userDetails)
+    {
+        _userDetails = userDetails;
+    }
+
+    #endregion
+
+    #region UserGoods
+
+    public void RequestGoodsChange(UserGoodsType goodsType, int value)
+    {
+        switch (goodsType)
+        {
+            case UserGoodsType.GOLD:
+                value += _userGoods.GOLD;
+                break;
+            case UserGoodsType.JEWEL:
+                value += _userGoods.JEWEL;
+                break;
+            case UserGoodsType.TICKET_WEAPON:
+                value += _userGoods.TICKET_WEAPON;
+                break;
+            case UserGoodsType.TICKET_ARMOR:
+                value += _userGoods.TICKET_ARMOR;
+                break;
+        }
+
+        StartCoroutine(UpdateUserGoods(goodsType, value, _userDetails.USER_ID));
+        _goodsChangedCallback?.Invoke(goodsType, value);
     }
 
     IEnumerator UpdateUserGoods(UserGoodsType column, int value, int userId)
@@ -345,29 +312,9 @@ public class DataBaseManager : MonoBehaviour
         }
     }
 
-    void InitUserDetails(UserDetails userDetails)
-    {
-        _userDetails = userDetails;
-    }
     void InitUserGoods(UserGoods userGoods)
     {
         _userGoods = userGoods;
-    }
-
-
-    void ProcessUserDetailsResponse(string response)
-    {
-        UserDetailsResponse userDetailsResponse = JsonUtility.FromJson<UserDetailsResponse>(response);
-
-        if (userDetailsResponse.success)
-        {
-            login_feedback.message = "User details retrieved successfully!";
-            InitUserDetails(userDetailsResponse.userDetails);
-        }
-        else
-        {
-            login_feedback.message = "Failed to retrieve user details: " + userDetailsResponse.message;
-        }
     }
 
     void ProcessUserGoodsResponse(string response)
@@ -384,11 +331,105 @@ public class DataBaseManager : MonoBehaviour
             goods_feedback.message = "Failed to retrieve user goods: " + userGoodsResponse.message;
         }
     }
-
-    
-
-
     #endregion
+
+    #region UserWeapon
+    public void RequestLoadWeaponData(int userId)
+    {
+        StartCoroutine(LoadWeaponData(userId));
+    }
+
+    IEnumerator LoadWeaponData(int userId)
+    {
+        string url = "http://localhost:3000/loadWeaponData";
+        WWWForm form = new WWWForm();
+
+        form.AddField("userId", userId);
+
+        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError(www.error);
+            }
+            else
+            {
+                string json = www.downloadHandler.text;
+                string wrappedJson = "{\"userWeapon\":" + json + "}";
+                weapon_feedback = JsonUtility.FromJson<UserWeaponResponse>(wrappedJson);
+                InitWeaponCount(weapon_feedback);
+            }
+        }
+    }
+
+    void InitUserWeapon(UserWeapon userWeapon)
+    {
+        _userWeapon = userWeapon;
+    }
+
+    void InitWeaponCount(UserWeaponResponse weapon_feedback)
+    {
+        if(weapon_CountList == null)
+        {
+            weapon_CountList = new();
+            foreach (var weapon in weapon_feedback.userWeapon)
+            {
+                weapon_CountList.Add(weapon.WeaponID, weapon.WeaponCount);
+            }
+        }
+    }
+
+    void BindWeapon()
+    {
+        foreach(var weapon in weapon_CountList)
+        {
+            if(weapon.Value > 5)
+            {
+                weapon_CountList[weapon.Key] -= 5;
+
+                if(weapon_CountList.ContainsKey(weapon.Key+1))
+                {
+                    weapon_CountList[weapon.Key + 1] += 1;
+                }
+                else
+                {
+                    weapon_CountList.Add(weapon.Key, 1);
+                }
+            }
+        }
+        //[todo] 이러고 DB에다가 ++하면 됨
+    }
+    IEnumerator UpdateUserWeapon(int weaponId, int value, int userId)
+    {
+        string url = "http://localhost:3000/updateUserGoods";
+        WWWForm form = new WWWForm();
+
+        form.AddField("userId", userId);
+        form.AddField("weaponId", weaponId);
+        form.AddField("value", value);
+
+        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                /*weapon_feedback.message = "Error: " + www.error;
+                weapon_feedback.success = false;*/
+            }
+            else
+            {
+                //weapon_feedback.success = true;
+                ProcessUserGoodsResponse(www.downloadHandler.text);
+            }
+        }
+    }
+
+    #endregion UserWeapon
+
+    #endregion Database Connection
 }
 
 [System.Serializable]
@@ -398,6 +439,7 @@ public class LoginResponse
     public string message;
     public UserDetails userDetails;
     public UserGoods userGoods;
+    public UserWeapon userWeapon;
     public int loginCountMonth;
     public bool isFirstLogin; // Add this field to store isFirstLogin status
 }
@@ -419,6 +461,13 @@ public class UserGoodsResponse
 }
 
 [System.Serializable]
+public class UserWeaponResponse
+{
+    public List<UserWeapon> userWeapon;
+}
+
+
+[System.Serializable]
 public class UserDetails
 {
     public int USER_ID;
@@ -438,4 +487,12 @@ public class UserGoods
     public int TICKET_WEAPON;
     public int TICKET_ARMOR;
 }
+
+[System.Serializable]
+public class UserWeapon
+{
+    public int WeaponID;
+    public int WeaponCount;
+}
+
 

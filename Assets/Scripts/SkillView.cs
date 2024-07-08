@@ -9,7 +9,7 @@ public class SkillView : MonoBehaviour
 
     #region Movement Define
 
-    [SerializeField] float moveValue = 200f;
+    [SerializeField] float moveValue = 250f;
     [SerializeField] float rolltime = 1.5f;
     bool isOpened = false;
 

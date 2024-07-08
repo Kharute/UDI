@@ -59,11 +59,25 @@ public class WeaponView : MonoBehaviour
             foreach (var weapon in weaponItemList)
             {
                 var weaponSlots = Prefab_WeaponSlot.GetComponent<WeaponSlotView>();
-                weaponSlots.SetUI(weapon.Value.ItemID);
+                weaponSlots.SetUI(weapon.Value.WeaponID);
 
                 Instantiate(Prefab_WeaponSlot, Transform_SlotRoot.transform);
             }
         }
     }
+
+    public void BindWeapon()
+    {
+
+
+        var weaponItemList = GameDataManager.Inst.WeaponInfoList;
+
+        foreach (var weapon in weaponItemList)
+        {
+            var weaponSlots = Prefab_WeaponSlot.GetComponent<WeaponSlotView>();
+            weaponSlots.SetUI(weapon.Value.WeaponID);
+        }
+    }
+
     #endregion
 }
