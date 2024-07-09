@@ -58,11 +58,10 @@ public class PlayerInfoView : MonoBehaviour
                         Slider_exp.maxValue = _detailData.REQEXP;
                     break;
                 case nameof(_vm.Exp):
-                    TextMesh_exp.text = $"{_vm.Exp} / {_detailData.REQEXP} exp";
+                    TextMesh_exp.text = $"{_vm.Exp} / {_detailData.REQEXP}";
                     Slider_exp.value = _vm.Exp;
                     break;
             }
         }
-        
     }
 }

@@ -3,6 +3,8 @@ using UnityEngine.Networking;
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Text;
+using Newtonsoft.Json;
 
 public enum UserGoodsType
 {
@@ -16,6 +18,8 @@ public enum UserGoodsType
 /// </summary>
 public class DataBaseManager : MonoBehaviour
 {
+    private const string BaseUrl = "http://localhost:3000";
+
     [SerializeField]
     OutGameView outGameView;
 
@@ -162,6 +166,7 @@ public class DataBaseManager : MonoBehaviour
     #region Database Connection
 
     #region Login
+
     public void RequestLogin(string username, string password)
     {
         StartCoroutine(Login(username, password));
@@ -169,7 +174,7 @@ public class DataBaseManager : MonoBehaviour
 
     IEnumerator Login(string username, string password)
     {
-        string url = "http://localhost:3000/login";
+        string url = $"{BaseUrl}/login";
         WWWForm form = new WWWForm();
         form.AddField("username", username);
         form.AddField("password", password);
@@ -288,7 +293,7 @@ public class DataBaseManager : MonoBehaviour
 
     IEnumerator UpdateUserGoods(UserGoodsType column, int value, int userId)
     {
-        string url = "http://localhost:3000/updateUserGoods";
+        string url = $"{BaseUrl}/updateUserGoods";
         WWWForm form = new WWWForm();
 
         form.AddField("userId", userId);
@@ -341,7 +346,7 @@ public class DataBaseManager : MonoBehaviour
 
     IEnumerator LoadWeaponData(int userId)
     {
-        string url = "http://localhost:3000/loadWeaponData";
+        string url = $"{BaseUrl}/loadWeaponData";
         WWWForm form = new WWWForm();
 
         form.AddField("userId", userId);
@@ -381,53 +386,145 @@ public class DataBaseManager : MonoBehaviour
         }
     }
 
-    void BindWeapon()
+    public void BindWeapon()
     {
-        foreach(var weapon in weapon_CountList)
-        {
-            if(weapon.Value > 5)
-            {
-                weapon_CountList[weapon.Key] -= 5;
+        bool isChanged = false;
+        var weaponsToUpdate = new Dictionary<int, int>();
+        var weaponsToAdd = new Dictionary<int, int>();
 
-                if(weapon_CountList.ContainsKey(weapon.Key+1))
+        foreach (var weapon in weapon_CountList)
+        {
+            if (weapon.Value >= 5)
+            {
+                isChanged = true;
+                int newCount = weapon.Value - 5;
+                weaponsToUpdate[weapon.Key] = newCount;
+
+                int upgradeWeaponId = weapon.Key + 1;
+                if (weapon_CountList.ContainsKey(upgradeWeaponId))
                 {
-                    weapon_CountList[weapon.Key + 1] += 1;
+                    weaponsToUpdate[upgradeWeaponId] = weapon_CountList[upgradeWeaponId] + 1;
                 }
                 else
                 {
-                    weapon_CountList.Add(weapon.Key, 1);
+                    weaponsToAdd[upgradeWeaponId] = 1;
                 }
             }
         }
-        //[todo] 이러고 DB에다가 ++하면 됨
-    }
-    IEnumerator UpdateUserWeapon(int weaponId, int value, int userId)
-    {
-        string url = "http://localhost:3000/updateUserGoods";
-        WWWForm form = new WWWForm();
 
+        // 변경사항 적용
+        foreach (var update in weaponsToUpdate)
+        {
+            weapon_CountList[update.Key] = update.Value;
+        }
+
+        foreach (var add in weaponsToAdd)
+        {
+            weapon_CountList.Add(add.Key, add.Value);
+        }
+
+        if (isChanged)
+        {
+            UploadUserWeaponData();
+        }
+    }
+
+    public void UploadUserWeaponData()
+    {
+        StartCoroutine(UploadWeaponData());
+    }
+
+    private IEnumerator UploadWeaponData()
+    {
+        string serverUrl = "http://localhost:3000/uploadWeaponData";
+
+        var weaponData = new List<WeaponData>();
+        foreach (var kvp in weapon_CountList)
+        {
+            weaponData.Add(new WeaponData
+            {
+                WeaponID = kvp.Key,
+                WeaponCount = kvp.Value
+            });
+        }
+
+        var data = new WeaponRequest
+        {
+            USER_ID = _userDetails.USER_ID,
+            weapons = weaponData
+        };
+
+        string jsonData = JsonUtility.ToJson(data);
+
+        UnityWebRequest www = new UnityWebRequest(serverUrl, "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Upload successful");
+        }
+        else
+        {
+            Debug.LogError("Error: " + www.error);
+        }
+    }
+
+    #endregion UserWeapon
+
+    #region Gacha System
+
+    public string url = $"{BaseUrl}/gacha";
+
+    public void RequestGacha(int count, Action<Dictionary<int, int>> callback)
+    {
+        StartCoroutine(RequestGachaCoroutine(_userDetails.USER_ID, count, callback));
+    }
+    
+    private IEnumerator RequestGachaCoroutine(int userId, int count, Action<Dictionary<int, int>> callback)
+    {
+        WWWForm form = new WWWForm();
         form.AddField("userId", userId);
-        form.AddField("weaponId", weaponId);
-        form.AddField("value", value);
+        form.AddField("count", count);
 
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if (www.result != UnityWebRequest.Result.Success)
             {
-                /*weapon_feedback.message = "Error: " + www.error;
-                weapon_feedback.success = false;*/
+                Debug.LogError(www.error);
             }
             else
             {
-                //weapon_feedback.success = true;
-                ProcessUserGoodsResponse(www.downloadHandler.text);
+                string jsonResponse = www.downloadHandler.text;
+                Dictionary<int, int> response = JsonConvert.DeserializeObject<Dictionary<int, int>>(jsonResponse);
+                ProcessGachaResponse(response);
+                callback?.Invoke(response);
             }
         }
     }
 
-    #endregion UserWeapon
+    private void ProcessGachaResponse(Dictionary<int, int> response)
+    {
+        foreach (var item in response)
+        {
+            if (weapon_CountList.ContainsKey(item.Key))
+            {
+                weapon_CountList[item.Key] += item.Value;
+            }
+            else
+            {
+                weapon_CountList[item.Key] = item.Value;
+            }
+        }
+    }
+
+    #endregion
 
     #endregion Database Connection
 }
@@ -466,7 +563,6 @@ public class UserWeaponResponse
     public List<UserWeapon> userWeapon;
 }
 
-
 [System.Serializable]
 public class UserDetails
 {
@@ -495,4 +591,17 @@ public class UserWeapon
     public int WeaponCount;
 }
 
+[System.Serializable]
+public class WeaponRequest
+{
+    public int USER_ID;
+    public List<WeaponData> weapons;
+}
+
+[System.Serializable]
+public class WeaponData
+{
+    public int WeaponID;
+    public int WeaponCount;
+}
 

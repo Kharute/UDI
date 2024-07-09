@@ -8,10 +8,16 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     Transform[] transforms;
+    Animator animator;
+
+    private void Awake()
+    {
+        animator = gameObject.GetComponentInChildren<Animator>();
+    }
 
     private void Update()
     {
-        if(transforms.Length > 0)
+        /*if(transforms.Length > 0)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
@@ -34,8 +40,26 @@ public class PlayerController : MonoBehaviour
                 gameObject.transform.position = transforms[4].position;
 
             }
+        }*/
+        if(Input.anyKey)
+        {
+            if(Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                animator.SetInteger("IsDance", 1);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                animator.SetInteger("IsDance", 2);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                animator.SetInteger("IsDance", 3);
+            }
         }
-        
+        else
+        {
+            animator.SetInteger("IsDance", 0);
+        }
     }
 
 }
