@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public enum ItemType
 {

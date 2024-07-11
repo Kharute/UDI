@@ -23,6 +23,6 @@ public class InventoryItemCreator : MonoBehaviour
             AssetDatabase.CreateAsset(item, assetPath);
         }*/
 
-        AssetDatabase.SaveAssets();
+        //AssetDatabase.SaveAssets();
     }
 }
