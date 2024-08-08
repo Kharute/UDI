@@ -16,10 +16,14 @@ public class Monster : MonoBehaviour
 
     private float followDistance = 50f;
     #endregion
+
     NavMeshAgent agent;
     Action action;
-
     Transform player_transform;
+
+    GameObject Player;
+
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -29,24 +33,30 @@ public class Monster : MonoBehaviour
     {
         if (agent != null)
         {
-            var Player = GameObject.FindWithTag("Player");
-            agent.SetDestination(Player.transform.position);
-            player_transform = Player.transform;
-            //action += TracePlayer();
+            Player = GameObject.FindWithTag("Player");
+            action += TracePlayer;
         }   
     }
     private void Update()
     {
-        float distance = Vector3.Distance(player_transform.position, transform.position);
-
-        if (distance < followDistance)
+        if (agent != null)
         {
-            action?.Invoke();
+            float distance = Vector3.Distance(player_transform.position, transform.position);
+
+            if (distance < followDistance)
+            {
+                action?.Invoke();
+            }
         }
+        
+
+        
     }
 
     void TracePlayer()
     {
-
+        
+        agent.SetDestination(Player.transform.position);
+        player_transform = Player.transform;
     }
 }

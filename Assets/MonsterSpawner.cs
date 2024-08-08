@@ -18,7 +18,6 @@ public class MonsterSpawner : MonoBehaviour
                 var monster = Instantiate(monster_prefab, spawnPoint[i]);
                 monster.SetActive(true);
                 monster_target.Add(monster);
-
             }
         }
     }
