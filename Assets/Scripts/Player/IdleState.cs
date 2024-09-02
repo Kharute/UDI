@@ -4,25 +4,47 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PlayerIdleState : IState
+
+public class PlayerStateBase
 {
     private PlayerController _player;
     private NavMeshAgent _agent;
     private Animator _anim;
     private Rigidbody _rig;
 
+    public PlayerController Player { get { return _player; } set {  _player = value; } }
+    public NavMeshAgent Agent { get { return _agent; } set { _agent = value; } }
+    public Animator Animator { get { return _anim; } set { _anim = value; } }
+    public Rigidbody Rig { get { return _rig; } set { _rig = value; } }
+}
+
+public class MonsterStateBase
+{
+    private Monster _monster;
+    private NavMeshAgent _agent;
+    private Animator _anim;
+    private Rigidbody _rig;
+
+    public Monster Monster { get { return _monster; } set { _monster = value; } }
+    public NavMeshAgent Agent { get { return _agent; } set { _agent = value; } }
+    public Animator Animator { get { return _anim; } set { _anim = value; } }
+    public Rigidbody Rig { get { return _rig; } set { _rig = value; } }
+}
+
+public class PlayerIdleState : PlayerStateBase, IState
+{
     public PlayerIdleState(PlayerController player, NavMeshAgent agent, Animator anim, Rigidbody rig)
     {
-        this._player = player;
-        _player.state = State.Idle;
-        this._agent = agent;
-        this._anim = anim;
-        this._rig = rig;
+        Player = player;
+        Player.state = State.Idle;
+        Agent = agent;
+        Animator = anim;
+        Rig = rig;
     }
 
     public void Enter()
     {
-        _player._anim.SetBool("Idle", true);
+        Animator.SetBool("Idle", true);
     }
 
     public void Update()
@@ -33,63 +55,53 @@ public class PlayerIdleState : IState
 
     public void Exit()
     {
-        _player._anim.SetBool("Idle", false);
+        Animator.SetBool("Idle", false);
     }
 }
 
-public class PlayerChaseState : IState
+public class PlayerChaseState : PlayerStateBase, IState
 {
-    private PlayerController _player;
-    private NavMeshAgent _agent;
-    private Animator _anim;
-    private Rigidbody _rig;
-
     public PlayerChaseState(PlayerController player, NavMeshAgent agent, Animator anim, Rigidbody rig)
     {
-        this._player = player;
-        _player.state = State.Run;
-        this._agent = agent;
-        this._anim = anim;
-        this._rig = rig;
+        Player = player;
+        Player.state = State.Run;
+        Agent = agent;
+        Animator = anim;
+        Rig = rig;
     }
 
     public void Enter()
     {
-        _player._anim.SetBool("Run", true);
+        Animator.SetBool("Run", true);
     }
 
     public void Update()
     {
-        // 대기 중 행동 로직
-        // 예: 자동 회복, 주변 아이템 수집 등
+        Vector3 lookrotation = Player._agent.steeringTarget - Player.transform.position;
+        Player.transform.rotation = Quaternion.Slerp(Player.transform.rotation, Quaternion.LookRotation(lookrotation), Time.deltaTime);
     }
 
     public void Exit()
     {
-        _player._anim.SetBool("Run", false);
+        Animator.SetBool("Run", false);
     }
 }
 
-public class PlayerAttackState : IState
+public class PlayerAttackState : PlayerStateBase, IState
 {
-    private PlayerController _player;
-    private NavMeshAgent _agent;
-    private Animator _anim;
-    private Rigidbody _rig;
-
     public PlayerAttackState(PlayerController player, NavMeshAgent agent, Animator anim, Rigidbody rig)
     {
-        this._player = player;
-        _player.state = State.Attack;
-        this._agent = agent;
-        this._anim = anim;
-        this._rig = rig;
+        Player = player;
+        Player.state = State.Attack;
+        Agent = agent;
+        Animator = anim;
+        Rig = rig;
     }
 
     public void Enter()
     {
-        _player._anim.SetBool("Attack", true);
-        _rig.constraints = RigidbodyConstraints.FreezeRotationY;
+        Animator.SetBool("Attack", true);
+        Rig.constraints = RigidbodyConstraints.FreezeAll;
     }
 
     public void Update()
@@ -101,24 +113,94 @@ public class PlayerAttackState : IState
 
     public void Exit()
     {
-        _player._anim.SetBool("Attack", false);
-        _rig.constraints = RigidbodyConstraints.None;
+        Animator.SetBool("Attack", false);
+        Rig.constraints = RigidbodyConstraints.None;
     }
 }
 
 
-public class MonsterIdleState : IState
+public class MonsterIdleState : MonsterStateBase, IState
 {
-    private Monster monster;
-
-    public MonsterIdleState(Monster monster)
+    public MonsterIdleState(Monster monster, NavMeshAgent agent, Animator anim, Rigidbody rig)
     {
-        this.monster = monster;
+        Monster = monster;
+        Monster.state = State.Idle;
+        Agent = agent;
+        Animator = anim;
+        Rig = rig;
     }
 
     public void Enter()
     {
-        // 대기 상태 진입 로직
+
+    }
+
+    public void Update()
+    {
+        Rig.constraints = RigidbodyConstraints.FreezeAll;
+    }
+
+    public void Exit()
+    {
+        Rig.constraints = RigidbodyConstraints.None;
+    }
+}
+
+public class MonsterChaseState : MonsterStateBase, IState
+{
+    public MonsterChaseState(Monster monster, NavMeshAgent agent, Animator anim, Rigidbody rig)
+    {
+        Monster = monster;
+        Monster.state = State.Idle;
+        Agent = agent;
+        Animator = anim;
+        Rig = rig;
+    }
+
+    public void Enter()
+    {
+
+    }
+
+    public void Update()
+    {
+        Vector3 lookrotation = Agent.steeringTarget - Monster.transform.position;
+        Monster.transform.rotation = Quaternion.Slerp(Monster.transform.rotation, Quaternion.LookRotation(lookrotation), Time.deltaTime);
+
+        if (Monster.tempX != 0 && Monster.tempY != 0)
+        {
+            float distanceX = Mathf.Abs(Monster.tempX - Monster.transform.position.x);
+            float distanceY = Mathf.Abs(Monster.tempY - Monster.transform.position.z);
+
+            Animator.SetFloat("FloatX", distanceX);
+            Animator.SetFloat("FloatY", distanceY);
+        }
+
+        Monster.tempX = Monster.transform.position.x;
+        Monster.tempY = Monster.transform.position.z;
+    }
+
+    public void Exit()
+    {
+        
+    }
+}
+
+public class MonsterAttackState : MonsterStateBase, IState
+{
+    public MonsterAttackState(Monster monster, NavMeshAgent agent, Animator anim, Rigidbody rig)
+    {
+        Monster = monster;
+        Monster.state = State.Idle;
+        Agent = agent;
+        Animator = anim;
+        Rig = rig;
+    }
+
+    public void Enter()
+    {
+        Animator.SetBool("Attack", true);
+        Rig.constraints = RigidbodyConstraints.FreezeAll;
     }
 
     public void Update()
@@ -129,7 +211,8 @@ public class MonsterIdleState : IState
 
     public void Exit()
     {
-        // 대기 상태 종료 로직
+        Animator.SetBool("Attack", false);
+        Rig.constraints = RigidbodyConstraints.None;
     }
 }
 

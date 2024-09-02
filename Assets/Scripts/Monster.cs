@@ -4,70 +4,115 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 public class Monster : MonoBehaviour
 {
-
-    void Update()
-    {
-        fsm.Update();
-    }
-
     #region Fields
+
+
     // MonsterPlant만의 게임 오브젝트(Projectile)
     [SerializeField] private GameObject projectile;
     [SerializeField] private float shootSpeed = 800.0f;
     [SerializeField] private Transform spawnPosition;
     [SerializeField] private ParticleSystem stabAttack;
 
-    private float followDistance = 20f;
+    GameObject Player;
+    NavMeshAgent _agent;
+    Animator _anim;
+    Rigidbody _rig;
+
+    public State state;
+    private FSM fsm;
+
+    float chaseDistance = 20.0f;
+    float attackDistance = 2.0f;
+
+    public float tempX, tempY;
+
+    public float _hp = 10f;
+
+    public float HP
+    {
+        get { return _hp; }
+        set { _hp = value; }
+    }
+
     #endregion
 
-    NavMeshAgent agent;
-    Action action;
-    Transform player_transform;
 
-    GameObject Player;
-
-    private FSM fsm;
 
     private void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
-        agent.stoppingDistance = 1f;
-        agent.destination = this.transform.position;
+        _agent = GetComponent<NavMeshAgent>();
+        _anim = GetComponent<Animator>();
+        _rig = GetComponent<Rigidbody>();
+        _agent.destination = transform.position;
         gameObject.tag = "Monster";
+
     }
 
     private void Start()
     {
         fsm = new FSM();
-        fsm.ChangeState(new MonsterIdleState(this));
+        fsm.ChangeState(new MonsterIdleState(this, _agent, _anim, _rig));
 
-        if (agent != null)
+        if (_agent != null)
         {
             Player = GameObject.FindWithTag("Player");
-            action += TracePlayer;
-        }   
+        }
     }
+    void Update()
+    {
+        fsm.Update();
+    }
+
     private void FixedUpdate()
     {
-        if (agent != null)
+        if (_agent != null)
         {
-            player_transform = Player.transform;
+            State tempState = State.Idle;
+            float dist = Vector3.Distance(gameObject.transform.position, Player.transform.position);
 
-            float distance = Vector3.Distance(player_transform.position, transform.position);
-
-            if (distance < followDistance)
+            if (dist < attackDistance)
+                tempState = State.Attack;
+            
+            else if (dist < chaseDistance)
+                tempState = State.Run;
+            
+            if (state != tempState)
             {
-                TracePlayer();
-                action?.Invoke();
+                switch (tempState)
+                {
+                    case State.Attack:
+                        fsm.ChangeState(new MonsterAttackState(this, _agent, _anim, _rig));
+                        //state = State.Attack;
+                        break;
+                    case State.Run:
+                        StartCoroutine("TracePlayer");
+                        fsm.ChangeState(new MonsterChaseState(this, _agent, _anim, _rig));
+                        //state = State.Run;
+                        break;
+                }
             }
         }
     }
 
-    void TracePlayer()
+    IEnumerator TracePlayer()
     {
-        agent.SetDestination(Player.transform.position);
+        while (Player.activeInHierarchy)
+        {
+            _agent.destination = Player.transform.position;
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        HP -= 1;
+        if(HP <= 0)
+        {
+            gameObject.SetActive(false);
+        }
     }
 }
