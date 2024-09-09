@@ -8,6 +8,7 @@ TagManager:
   - Skill
   - Item
   - Goal
+  - Trigger
   layers:
   - Default
   - TransparentFX

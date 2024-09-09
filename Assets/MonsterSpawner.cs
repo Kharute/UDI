@@ -13,7 +13,6 @@ public class MonsterSpawner : MonoBehaviour
     int spawnTime = 0;
     private void Awake()
     {
-        //여기서 풀땡기고
         if (spawnPoint1.Length > 0)
         {
             foreach (GameObject obj in monster_prefab)
@@ -33,12 +32,20 @@ public class MonsterSpawner : MonoBehaviour
     {
         for (int i = 0; i < spawnPoint1.Length; i++)
         {
-            monster_target[i+spawnTime*spawnPoint1.Length].SetActive(false);
+            monster_target[i].SetActive(true);
         }
 
         if(spawnTime == monster_prefab.Count())
             spawnTime = 0;
         else
             spawnTime++;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("Player"))
+        {
+            MonsterSpawn();
+        }
     }
 }

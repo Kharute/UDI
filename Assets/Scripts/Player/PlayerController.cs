@@ -90,12 +90,12 @@ public class PlayerController : MonoBehaviour
             if (closestTarget != null)
             {
                 target = closestTarget;
-                StartCoroutine(ChaseMonster());
+                StartCoroutine(ChaseTarget());
             }
             else if (target == null || !target.activeInHierarchy)
             {
                 target = goal;
-                StartCoroutine(ChaseMonster());
+                StartCoroutine(ChaseTarget());
             }
         }
     }
@@ -120,10 +120,9 @@ public class PlayerController : MonoBehaviour
     {
         if (distance < attackDistance)
             return State.Attack;
-        else if (distance < chaseDistance)
-            return State.Run;
         else
-            return State.Idle;
+            return State.Run;
+
     }
 
     public void SwitchToState(State newState)
@@ -162,7 +161,7 @@ public class PlayerController : MonoBehaviour
         return closest;
     }
 
-    IEnumerator ChaseMonster()
+    IEnumerator ChaseTarget()
     {
         while (target != null && target.activeInHierarchy)
         {

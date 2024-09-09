@@ -28,7 +28,8 @@ public class Monster : MonoBehaviour
 
     public float tempX, tempY;
 
-    public float _hp = 10f;
+    public float MaxHP = 10f;
+    private float _hp = 10f;
 
     public float HP
     {
@@ -37,8 +38,6 @@ public class Monster : MonoBehaviour
     }
 
     #endregion
-
-
 
     private void Awake()
     {
@@ -108,9 +107,12 @@ public class Monster : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         HP -= 1;
+
         if(HP <= 0)
         {
+            gameObject.transform.localPosition = Vector3.zero;
             gameObject.SetActive(false);
+            HP = MaxHP;
         }
     }
 }
