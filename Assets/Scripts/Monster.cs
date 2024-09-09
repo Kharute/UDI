@@ -10,8 +10,6 @@ public class Monster : MonoBehaviour
 {
     #region Fields
 
-
-    // MonsterPlant만의 게임 오브젝트(Projectile)
     [SerializeField] private GameObject projectile;
     [SerializeField] private float shootSpeed = 800.0f;
     [SerializeField] private Transform spawnPosition;

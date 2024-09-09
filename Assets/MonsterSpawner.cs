@@ -1,32 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
 {
-    [SerializeField] GameObject monster_prefab;
-    [SerializeField] Transform[] spawnPoint;
+    [SerializeField] GameObject[] monster_prefab;
+    [SerializeField] Transform[] spawnPoint1;
 
     List<GameObject> monster_target = new List<GameObject>();
 
+    int spawnTime = 0;
     private void Awake()
     {
-        if (spawnPoint.Length > 0)
+        //여기서 풀땡기고
+        if (spawnPoint1.Length > 0)
         {
-            for (int i = 0; i < spawnPoint.Length; i++)
+            foreach (GameObject obj in monster_prefab)
             {
-                var monster = Instantiate(monster_prefab, spawnPoint[i]);
-                monster.SetActive(true);
-                monster_target.Add(monster);
+                for (int i = 0; i < spawnPoint1.Length; i++)
+                {
+                    var monster = Instantiate(obj, spawnPoint1[i]);
+                    monster.SetActive(true);
+                    monster_target.Add(monster);
+                    monster.SetActive(false);
+                }
             }
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void MonsterSpawn()
     {
-        if (other.CompareTag("Player"))
+        for (int i = 0; i < spawnPoint1.Length; i++)
         {
-            
+            monster_target[i+spawnTime*spawnPoint1.Length].SetActive(false);
         }
+
+        if(spawnTime == monster_prefab.Count())
+            spawnTime = 0;
+        else
+            spawnTime++;
     }
 }

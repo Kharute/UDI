@@ -12,23 +12,44 @@ public class InfiniteMap : MonoBehaviour
     {
         if(spawnCollider1.isTrigger)
         {
-            //½ºÆùÇÏ¼î
+            OnTriggerEnter(spawnCollider1);
         }
         if (spawnCollider2.isTrigger)
         {
-            //½ºÆùÇÏ¼î
+            OnTriggerEnter(spawnCollider2);
         }
-    }
-    void Awake()
-    {
-        
+        if (goalCollider.isTrigger)
+        {
+            OnTriggerEnter(goalCollider);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Player"))
+        switch(other.gameObject.name)
         {
+            case "spawnCollider1":
+                MonsterSpawner s1 = spawnCollider1.GetComponent<MonsterSpawner>();
+                if (s1 != null)
+                    s1.MonsterSpawn();
+                /*PlayerController p = other.gameObject.GetComponent<PlayerController>();
 
+                foreach (GameObject go in p.AllObjects)
+                {
+                    go.gameObject.SetActive(true);
+                } */
+                break;
+
+            case "spawnCollider2":
+                MonsterSpawner s2 = spawnCollider2.GetComponent<MonsterSpawner>();
+                if (s2 != null)
+                    s2.MonsterSpawn();
+                break;
+
+            case "goalCollider":
+                if (other.CompareTag("Player"))
+                    other.gameObject.transform.position = Vector3.zero;
+                break;
         }
     }
 }
