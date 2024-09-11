@@ -16,9 +16,10 @@ public enum UserGoodsType
 /// <summary>
 /// 외부 데이터를 Save/Load 하기 위한 Manager
 /// </summary>
+
 public class DataBaseManager : MonoBehaviour
 {
-    private const string BaseUrl = "http://localhost:3000";
+    [SerializeField] AppSettings appSettings;
 
     [SerializeField]
     OutGameView outGameView;
@@ -174,7 +175,7 @@ public class DataBaseManager : MonoBehaviour
 
     IEnumerator Login(string username, string password)
     {
-        string url = $"{BaseUrl}/login";
+        string url = $"{appSettings.IPAddress}:{appSettings.Port}/login";
         WWWForm form = new WWWForm();
         form.AddField("username", username);
         form.AddField("password", password);
@@ -223,7 +224,8 @@ public class DataBaseManager : MonoBehaviour
     #region UserDetails
     IEnumerator UpdateUserDetails(string column, int value, int userId)
     {
-        string url = "http://localhost:3000/updateUserDetails";
+        string url = $"{appSettings.IPAddress}:{appSettings.Port}/updateUserDetails";
+
         WWWForm form = new WWWForm();
         form.AddField("userId", userId);
         form.AddField("column", column);
@@ -293,7 +295,7 @@ public class DataBaseManager : MonoBehaviour
 
     IEnumerator UpdateUserGoods(UserGoodsType column, int value, int userId)
     {
-        string url = $"{BaseUrl}/updateUserGoods";
+        string url = $"{appSettings.IPAddress}:{appSettings.Port}/updateUserGoods";
         WWWForm form = new WWWForm();
 
         form.AddField("userId", userId);
@@ -346,7 +348,8 @@ public class DataBaseManager : MonoBehaviour
 
     IEnumerator LoadWeaponData(int userId)
     {
-        string url = $"{BaseUrl}/loadWeaponData";
+        string url = $"{appSettings.IPAddress}:{appSettings.Port}/loadWeaponData";
+
         WWWForm form = new WWWForm();
 
         form.AddField("userId", userId);
@@ -436,7 +439,7 @@ public class DataBaseManager : MonoBehaviour
 
     private IEnumerator UploadWeaponData()
     {
-        string serverUrl = "http://localhost:3000/uploadWeaponData";
+        string url = $"{appSettings.IPAddress}:{appSettings.Port}/uploadWeaponData";
 
         var weaponData = new List<WeaponData>();
         foreach (var kvp in weapon_CountList)
@@ -456,7 +459,7 @@ public class DataBaseManager : MonoBehaviour
 
         string jsonData = JsonUtility.ToJson(data);
 
-        UnityWebRequest www = new UnityWebRequest(serverUrl, "POST");
+        UnityWebRequest www = new UnityWebRequest(url, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         www.uploadHandler = new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = new DownloadHandlerBuffer();
@@ -478,8 +481,6 @@ public class DataBaseManager : MonoBehaviour
 
     #region Gacha System
 
-    public string url = $"{BaseUrl}/gacha";
-
     public void RequestGacha(int count, Action<Dictionary<int, int>> callback)
     {
         StartCoroutine(RequestGachaCoroutine(_userDetails.USER_ID, count, callback));
@@ -487,6 +488,8 @@ public class DataBaseManager : MonoBehaviour
     
     private IEnumerator RequestGachaCoroutine(int userId, int count, Action<Dictionary<int, int>> callback)
     {
+        string url = $"{appSettings.IPAddress}:{appSettings.Port}/gacha";
+
         WWWForm form = new WWWForm();
         form.AddField("userId", userId);
         form.AddField("count", count);

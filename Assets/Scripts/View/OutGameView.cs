@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class OutGameView : MonoBehaviour
 {
+
     [SerializeField] Button loginButton;
 
     [SerializeField] TMP_InputField usernameField;
@@ -46,17 +47,6 @@ public class OutGameView : MonoBehaviour
         else
         {
             DataBaseManager.Inst.RequestLogin(username, password);
-            /*
-             * LoginResponse log_res = 
-             * 
-                if (log_res.success)
-                {
-                        gameObject.SetActive(false);
-                }
-                else
-                {
-                        feedbackText.text = log_res.message;
-                }*/
         }
     }
 
@@ -69,10 +59,6 @@ public class OutGameView : MonoBehaviour
     {
         while (true)
         {
-            /*if (log_res.message == null)
-            {
-                break;
-            }*/
             yield return new WaitForSeconds(0.1f);
         }
     }
