@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WeaponInfo>
+  <dataCategory>
+    <data WeaponID="1" ItemID="1" WeaponName="Common Sword I" Tier="1" />
+    <data WeaponID="2" ItemID="1" WeaponName="Common Sword II" Tier="2" />
+    <data WeaponID="3" ItemID="1" WeaponName="Common Sword III" Tier="3" />
+    <data WeaponID="4" ItemID="1" WeaponName="Common Sword IV" Tier="4" />
+    <data WeaponID="5" ItemID="2" WeaponName="Uncommon Blade I" Tier="1" />
+    <data WeaponID="6" ItemID="2" WeaponName="Uncommon Blade II" Tier="2" />
+    <data WeaponID="7" ItemID="2" WeaponName="Uncommon Blade III" Tier="3" />
+    <data WeaponID="8" ItemID="2" WeaponName="Uncommon Blade IV" Tier="4" />
+    <data WeaponID="9" ItemID="3" WeaponName="Rare Dagger I" Tier="1" />
+    <data WeaponID="10" ItemID="3" WeaponName="Rare Dagger II" Tier="2" />
+    <data WeaponID="11" ItemID="3" WeaponName="Rare Dagger III" Tier="3" />
+    <data WeaponID="12" ItemID="3" WeaponName="Rare Dagger IV" Tier="4" />
+    <data WeaponID="13" ItemID="4" WeaponName="Super Rare Axe I" Tier="1" />
+    <data WeaponID="14" ItemID="4" WeaponName="Super Rare Axe II" Tier="2" />
+    <data WeaponID="15" ItemID="4" WeaponName="Super Rare Axe III" Tier="3" />
+    <data WeaponID="16" ItemID="4" WeaponName="Super Rare Axe IV" Tier="4" />
+    <data WeaponID="17" ItemID="5" WeaponName="Ultra Rare Hammer I" Tier="1" />
+    <data WeaponID="18" ItemID="5" WeaponName="Ultra Rare Hammer II" Tier="2" />
+    <data WeaponID="19" ItemID="5" WeaponName="Ultra Rare Hammer III" Tier="3" />
+    <data WeaponID="20" ItemID="5" WeaponName="Ultra Rare Hammer IV" Tier="4" />
+    <data WeaponID="21" ItemID="6" WeaponName="Unique Spear I" Tier="1" />
+    <data WeaponID="22" ItemID="6" WeaponName="Unique Spear II" Tier="2" />
+    <data WeaponID="23" ItemID="6" WeaponName="Unique Spear III" Tier="3" />
+    <data WeaponID="24" ItemID="6" WeaponName="Unique Spear IV" Tier="4" />
+    <data WeaponID="25" ItemID="7" WeaponName="Hyper Unique Bow I" Tier="1" />
+    <data WeaponID="26" ItemID="7" WeaponName="Hyper Unique Bow II" Tier="2" />
+    <data WeaponID="27" ItemID="7" WeaponName="Hyper Unique Bow III" Tier="3" />
+    <data WeaponID="28" ItemID="7" WeaponName="Hyper Unique Bow IV" Tier="4" />
+    <data WeaponID="29" ItemID="8" WeaponName="Epic Staff I" Tier="1" />
+    <data WeaponID="30" ItemID="8" WeaponName="Epic Staff II" Tier="2" />
+    <data WeaponID="31" ItemID="8" WeaponName="Epic Staff III" Tier="3" />
+    <data WeaponID="32" ItemID="8" WeaponName="Epic Staff IV" Tier="4" />
+    <data WeaponID="33" ItemID="9" WeaponName="Ultimate Epic Wand I" Tier="1" />
+    <data WeaponID="34" ItemID="9" WeaponName="Ultimate Epic Wand II" Tier="2" />
+    <data WeaponID="35" ItemID="9" WeaponName="Ultimate Epic Wand III" Tier="3" />
+    <data WeaponID="36" ItemID="9" WeaponName="Ultimate Epic Wand IV" Tier="4" />
+    <data WeaponID="37" ItemID="10" WeaponName="Legendary Saber I" Tier="1" />
+    <data WeaponID="38" ItemID="10" WeaponName="Legendary Saber II" Tier="2" />
+    <data WeaponID="39" ItemID="10" WeaponName="Legendary Saber III" Tier="3" />
+    <data WeaponID="40" ItemID="10" WeaponName="Legendary Saber IV" Tier="4" />
+  </dataCategory>
+</WeaponInfo>
