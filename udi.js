@@ -67,11 +67,11 @@ app.post('/login', (req, res) => {
         }
 
         if (results.length > 0) {
-            const userId = results[0].user_id;
+            const userId = results[0].USER_ID;
             let loginCountMonth = results[0].login_count_month;
-            let loginIsFirst = login_isfirst;
+            let loginIsFirst = results[0].login_isfirst;
             const lastLoginDate = results[0].login_date ? new Date(results[0].login_date) : null;
-            const currentTime = login_time;
+            const currentTime = results[0].login_time;
             const currentHour = currentTime.getHours();
 
             db.beginTransaction(transactionErr => {
