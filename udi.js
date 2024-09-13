@@ -6,7 +6,7 @@ const mysql = require('mysql');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = 7777;
 
 // MySQL 연결 설정
 const db = mysql.createConnection({
