@@ -11,7 +11,7 @@ const port = 7777;
 
 // MySQL 연결 설정
 const db = mysql.createConnection({
-    host: ip,
+    host: 'localhost',
     user: 'root',
     password: '1234',
     database: 'UDI'
