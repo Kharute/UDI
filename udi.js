@@ -6,11 +6,12 @@ const mysql = require('mysql');
 const path = require('path');
 
 const app = express();
+const ip = '15.165.15.237';
 const port = 7777;
 
 // MySQL 연결 설정
 const db = mysql.createConnection({
-    host: '15.165.15.237',
+    host: ip,
     user: 'root',
     password: '1234',
     database: 'UDI'
@@ -451,5 +452,5 @@ app.post('/gacha', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running on http://${db.mysql.host}:${port}`);
+    console.log(`Server running on http://${ip}:${port}`);
 });
