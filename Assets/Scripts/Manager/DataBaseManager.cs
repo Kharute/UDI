@@ -42,6 +42,7 @@ public class DataBaseManager : MonoBehaviour
     private int _loginCountMonth;
     private bool _isFirstLogin;
 
+    [SerializeField]
     private LoginResponse login_feedback = new();
     private UserGoodsResponse goods_feedback = new();
     private UserWeaponResponse weapon_feedback = new();
@@ -68,7 +69,7 @@ public class DataBaseManager : MonoBehaviour
     #region Getter
     public int GetPlayerLevel()
     {
-        return _userDetails != null ? _userDetails.LEVEL : 0;
+        return _userDetails != null ? _userDetails.level : 0;
     }
 
     public int GetLoginCountMonth()
@@ -138,25 +139,25 @@ public class DataBaseManager : MonoBehaviour
     #region MVVM Details
     public void RequestLevelUp()
     {
-        _userDetails.LEVEL += 1;
-        StartCoroutine(UpdateUserDetails("LEVEL", _userDetails.LEVEL, _userDetails.USER_ID));
-        _levelUpCallback?.Invoke(_userDetails.LEVEL);
+        _userDetails.level += 1;
+        StartCoroutine(UpdateUserDetails("level", _userDetails.level, _userDetails.user_id));
+        _levelUpCallback?.Invoke(_userDetails.level);
     }
 
     public void RequestExpGain(int exp)
     {
-        if (_userDetails.LEVEL < GameDataManager.Inst.LevelInfoList.Count)
+        if (_userDetails.level < GameDataManager.Inst.LevelInfoList.Count)
         {
-            var _playerDetail = GameDataManager.Inst.GetPlayerDetailData(_userDetails.LEVEL);
-            _userDetails.EXPERIENCE += exp;
-            if (_userDetails.EXPERIENCE > _playerDetail.REQEXP)
+            var _playerDetail = GameDataManager.Inst.GetPlayerDetailData(_userDetails.level);
+            _userDetails.experience+= exp;
+            if (_userDetails.experience> _playerDetail.REQEXP)
             {
-                _userDetails.EXPERIENCE -= _playerDetail.REQEXP;
+                _userDetails.experience -= _playerDetail.REQEXP;
                 Inst.RequestLevelUp();
             }
 
-            StartCoroutine(UpdateUserDetails("EXPERIENCE", _userDetails.EXPERIENCE, _userDetails.USER_ID));
-            _expUpCallback?.Invoke(_userDetails.EXPERIENCE);
+            StartCoroutine(UpdateUserDetails("experience", _userDetails.level, _userDetails.user_id));
+            _expUpCallback?.Invoke(_userDetails.experience);
         }
     }
 
@@ -183,11 +184,13 @@ public class DataBaseManager : MonoBehaviour
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
             yield return www.SendWebRequest();
-
+            /*Debug.Log($"www.result : {www.responseCode}");
+            Debug.Log($"www.result : {www.result}");*/
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
                 login_feedback.message = "Error: " + www.error;
                 login_feedback.success = false;
+                Debug.Log("login error");
             }
             else
             {
@@ -201,11 +204,11 @@ public class DataBaseManager : MonoBehaviour
                     // Data Load
                     InitUserDetails(loginResponse.userDetails);
                     InitUserGoods(loginResponse.userGoods);
-                    RequestLoadWeaponData(loginResponse.userDetails.USER_ID);
+                    RequestLoadWeaponData(loginResponse.userDetails.user_id);
 
                     _loginCountMonth = loginResponse.loginCountMonth;
                     _isFirstLogin = loginResponse.isFirstLogin;
-                    _loginCallback?.Invoke(loginResponse.userDetails.USER_ID, loginResponse.userDetails.LEVEL);
+                    _loginCallback?.Invoke(loginResponse.userDetails.user_id, loginResponse.userDetails.level);
 
                     // Game Scene Change.
                     outGameView.OnDisable_Login();
@@ -223,7 +226,7 @@ public class DataBaseManager : MonoBehaviour
 
     #region UserDetails
     IEnumerator UpdateUserDetails(string column, int value, int userId)
-    {
+    {   
         string url = $"{appSettings.IPAddress}:{appSettings.Port}/updateUserDetails";
 
         WWWForm form = new WWWForm();
@@ -276,20 +279,20 @@ public class DataBaseManager : MonoBehaviour
         switch (goodsType)
         {
             case UserGoodsType.GOLD:
-                value += _userGoods.GOLD;
+                value += _userGoods.gold;
                 break;
             case UserGoodsType.JEWEL:
-                value += _userGoods.JEWEL;
+                value += _userGoods.jewel;
                 break;
             case UserGoodsType.TICKET_WEAPON:
-                value += _userGoods.TICKET_WEAPON;
+                value += _userGoods.ticket_weapon;
                 break;
             case UserGoodsType.TICKET_ARMOR:
-                value += _userGoods.TICKET_ARMOR;
+                value += _userGoods.ticket_armor;
                 break;
         }
 
-        StartCoroutine(UpdateUserGoods(goodsType, value, _userDetails.USER_ID));
+        StartCoroutine(UpdateUserGoods(goodsType, value, _userDetails.user_id));
         _goodsChangedCallback?.Invoke(goodsType, value);
     }
 
@@ -357,6 +360,8 @@ public class DataBaseManager : MonoBehaviour
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
             yield return www.SendWebRequest();
+            Debug.Log($"www.result : {www.responseCode}");
+            Debug.Log($"www.result : {www.result}");
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
@@ -384,7 +389,7 @@ public class DataBaseManager : MonoBehaviour
             weapon_CountList = new();
             foreach (var weapon in weapon_feedback.userWeapon)
             {
-                weapon_CountList.Add(weapon.WeaponID, weapon.WeaponCount);
+                weapon_CountList.Add(weapon.weapon_id, weapon.weapon_count);
             }
         }
     }
@@ -446,14 +451,14 @@ public class DataBaseManager : MonoBehaviour
         {
             weaponData.Add(new WeaponData
             {
-                WeaponID = kvp.Key,
-                WeaponCount = kvp.Value
+                weapon_id = kvp.Key,
+                weapon_count = kvp.Value
             });
         }
 
         var data = new WeaponRequest
         {
-            USER_ID = _userDetails.USER_ID,
+            user_id = _userDetails.user_id,
             weapons = weaponData
         };
 
@@ -483,7 +488,7 @@ public class DataBaseManager : MonoBehaviour
 
     public void RequestGacha(int count, Action<Dictionary<int, int>> callback)
     {
-        StartCoroutine(RequestGachaCoroutine(_userDetails.USER_ID, count, callback));
+        StartCoroutine(RequestGachaCoroutine(_userDetails.user_id, count, callback));
     }
     
     private IEnumerator RequestGachaCoroutine(int userId, int count, Action<Dictionary<int, int>> callback)
@@ -569,42 +574,42 @@ public class UserWeaponResponse
 [System.Serializable]
 public class UserDetails
 {
-    public int USER_ID;
-    public string NICKNAME;
-    public int LEVEL;
-    public int EXPERIENCE;
-    public int SKILL_POINT;
-    public string INVENTORY;
+    public int user_id;
+    public string nickname;
+    public int level;
+    public int experience;
+    public int skill_point;
+    public string inventory;
 }
 
 [System.Serializable]
 public class UserGoods
 {
-    public int USER_ID;
-    public int GOLD;
-    public int JEWEL;
-    public int TICKET_WEAPON;
-    public int TICKET_ARMOR;
+    public int user_id;
+    public int gold;
+    public int jewel;
+    public int ticket_weapon;
+    public int ticket_armor;
 }
 
 [System.Serializable]
 public class UserWeapon
 {
-    public int WeaponID;
-    public int WeaponCount;
+    public int weapon_id;
+    public int weapon_count;
 }
 
 [System.Serializable]
 public class WeaponRequest
 {
-    public int USER_ID;
+    public int user_id;
     public List<WeaponData> weapons;
 }
 
 [System.Serializable]
 public class WeaponData
 {
-    public int WeaponID;
-    public int WeaponCount;
+    public int weapon_id;
+    public int weapon_count;
 }
 

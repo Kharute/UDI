@@ -230,12 +230,12 @@ public class GameDataManager : MonoBehaviour
         {
             WeaponInfo weaponInfoData = new WeaponInfo();
 
-            weaponInfoData.WeaponID = int.Parse(data.Attribute(nameof(weaponInfoData.WeaponID)).Value);
+            weaponInfoData.weapon_id = int.Parse(data.Attribute(nameof(weaponInfoData.weapon_id)).Value);
             weaponInfoData.ItemID = int.Parse(data.Attribute(nameof(weaponInfoData.ItemID)).Value);
             weaponInfoData.WeaponName = data.Attribute(nameof(weaponInfoData.WeaponName)).Value;
             weaponInfoData.Tier = int.Parse(data.Attribute(nameof(weaponInfoData.Tier)).Value);
 
-            WeaponInfoList.Add(weaponInfoData.WeaponID, weaponInfoData);
+            WeaponInfoList.Add(weaponInfoData.weapon_id, weaponInfoData);
         }
     }
     #endregion

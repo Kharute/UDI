@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class OutGameView : MonoBehaviour
 {
-
     [SerializeField] Button loginButton;
 
     [SerializeField] TMP_InputField usernameField;
@@ -17,9 +16,10 @@ public class OutGameView : MonoBehaviour
     {
         OnClick_MenuButton();
     }
+
     void Start()
     {    
-        loginButton.onClick?.AddListener(OnClick_LoginButton);   
+        loginButton.onClick?.AddListener(OnClick_LoginButton);
     }
 
     public void OnClick_MenuButton()
@@ -31,7 +31,7 @@ public class OutGameView : MonoBehaviour
     public void OnClick_EnterButton()
     {
         transform.GetChild(0).gameObject.SetActive(false);  // MainPanel
-        transform.GetChild(1).gameObject.SetActive(true); // LoginPanel
+        transform.GetChild(1).gameObject.SetActive(true);   // LoginPanel
     }
 
     public void OnClick_LoginButton()

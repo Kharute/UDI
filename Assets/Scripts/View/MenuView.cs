@@ -22,7 +22,7 @@ public class MenuView : MonoBehaviour
 
     public void OnButtonClick_Dive()
     {
-        DataBaseManager.Inst.RequestExpGain(3);
+        
     }
 
 

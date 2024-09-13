@@ -83,12 +83,10 @@ public class Monster : MonoBehaviour
                 {
                     case State.Attack:
                         fsm.ChangeState(new MonsterAttackState(this, _agent, _anim, _rig));
-                        //state = State.Attack;
                         break;
                     case State.Run:
                         StartCoroutine("TracePlayer");
                         fsm.ChangeState(new MonsterChaseState(this, _agent, _anim, _rig));
-                        //state = State.Run;
                         break;
                 }
             }
@@ -112,6 +110,7 @@ public class Monster : MonoBehaviour
         {
             gameObject.transform.localPosition = Vector3.zero;
             gameObject.SetActive(false);
+            DataBaseManager.Inst.RequestExpGain(3);
             HP = MaxHP;
         }
     }

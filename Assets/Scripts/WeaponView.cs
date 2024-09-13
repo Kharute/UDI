@@ -59,7 +59,7 @@ public class WeaponView : MonoBehaviour
             foreach (var weapon in weaponItemList)
             {
                 var weaponSlots = Prefab_WeaponSlot.GetComponent<WeaponSlotView>();
-                weaponSlots.SetUI(weapon.Value.WeaponID);
+                weaponSlots.SetUI(weapon.Value.weapon_id);
 
                 Instantiate(Prefab_WeaponSlot, Transform_SlotRoot.transform);
             }
@@ -76,9 +76,9 @@ public class WeaponView : MonoBehaviour
 
         foreach (var weapon in weaponItemList)
         {
-            var objsList = objList[weapon.Value.WeaponID-1].GetComponent<WeaponSlotView>();
+            var objsList = objList[weapon.Value.weapon_id -1].GetComponent<WeaponSlotView>();
 
-            objsList.SetUI(weapon.Value.WeaponID);
+            objsList.SetUI(weapon.Value.weapon_id);
         }
     }
 

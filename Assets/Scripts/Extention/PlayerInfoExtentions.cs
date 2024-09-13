@@ -11,9 +11,9 @@ public static class PlayerInfoExtentions
     }
     public static void OnRefreshViewModel_PlayerInfo(this PlayerInfoViewModel vm, UserDetails userDetails)
     {
-        vm.Name = userDetails.NICKNAME;
-        vm.Level = userDetails.LEVEL;
-        vm.Exp = userDetails.EXPERIENCE;
+        vm.Name = userDetails.nickname;
+        vm.Level = userDetails.level;
+        vm.Exp = userDetails.experience;
     }
     public static void RegisterEventsOnEnable_PlayerInfo(this PlayerInfoViewModel vm, bool isEventEnable)
     {
@@ -51,8 +51,8 @@ public static class PlayerInfoExtentions
     }
     public static void OnRefreshViewModel_PlayerInfo(this GoodsViewModel vm, UserGoods userDetails)
     {
-        vm.Gold = userDetails.GOLD;
-        vm.Jewel = userDetails.JEWEL;
+        vm.Gold = userDetails.gold;
+        vm.Jewel = userDetails.jewel;
     }
 
     public static void RegisterEventsOnEnable_Goods(this GoodsViewModel vm, bool isEventEnable)

@@ -86,7 +86,7 @@ public class SkillTreeSlot
 public class WeaponInfo
 {
 
-    public int WeaponID;
+    public int weapon_id;
     public int ItemID;
     public string WeaponName;
     public int Tier;
