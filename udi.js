@@ -51,6 +51,7 @@ fs.readFile(xmlFilePath, (err, data) => {
 });
 
 app.post('/login', (req, res) => {
+    console.log('Received request:', req.body);
     const username = req.body.username;
     const password = req.body.password;
 
@@ -58,7 +59,7 @@ app.post('/login', (req, res) => {
         return res.json({ success: false, message: 'Please provide username and password' });
     }
 
-    const query = 'SELECT USER_ID, LOGIN_COUNT_MONTH, LOGIN_ISFIRST, LOGIN_DATE FROM USER_LOGIN WHERE user_name = ? AND password = ?';
+    const query = 'SELECT user_id, login_count_month, login_isfirst, login_date FROM user_login WHERE user_name = ? AND password = ?';
     db.query(query, [username, password], (err, results) => {
         if (err) {
             return res.json({ success: false, message: 'Database query error to login' });
@@ -77,7 +78,7 @@ app.post('/login', (req, res) => {
                     return res.json({ success: false, message: 'Failed to start transaction' });
                 }
 
-                const updateLoginTimeQuery = 'UPDATE USER_LOGIN SET LOGIN_TIME = ?, LOGIN_DATE = ? WHERE USER_ID = ?';
+                const updateLoginTimeQuery = 'UPDATE user_logion SET login_time = ?, login_date = ? WHERE user_id = ?';
                 db.query(updateLoginTimeQuery, [currentTime, currentTime, userId], (updateTimeErr) => {
                     if (updateTimeErr) {
                         return db.rollback(() => {
@@ -91,7 +92,7 @@ app.post('/login', (req, res) => {
                     }
 
                     if (currentHour >= 6 && (!lastLoginDate || lastLoginDate.toDateString() !== currentTime.toDateString())) {
-                        const incrementLoginCountQuery = 'UPDATE USER_LOGIN SET LOGIN_COUNT_MONTH = ?, LOGIN_ISFIRST = 1 WHERE USER_ID = ?';
+                        const incrementLoginCountQuery = 'UPDATE user_login SET login_count_month = ?, login_isfirst = 1 WHERE user_id = ?';
                         db.query(incrementLoginCountQuery, [loginCountMonth + 1, userId], (incrementCountErr) => {
                             if (incrementCountErr) {
                                 return db.rollback(() => {
@@ -108,8 +109,8 @@ app.post('/login', (req, res) => {
                 });
 
                 function processUserDetails() {
-                    console.log('Processing user details for USER_ID:', userId);
-                    const checkUserDetailsQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
+                    console.log('Processing user details for user_id:', userId);
+                    const checkUserDetailsQuery = 'SELECT * FROM user_details WHERE user_id = ?';
                     db.query(checkUserDetailsQuery, [userId], (checkUserDetailsErr, userDetailsResults) => {
                         if (checkUserDetailsErr) {
                             console.error('Error checking user details:', checkUserDetailsErr);
@@ -122,7 +123,7 @@ app.post('/login', (req, res) => {
                 
                         if (userDetailsResults.length === 0) {
                             console.log('Inserting new user details');
-                            const insertUserDetailsQuery = 'INSERT INTO USER_DETAILS (USER_ID, NICKNAME, LEVEL, EXPERIENCE, SKILL_POINT, INVENTORY) VALUES (?, "NONAME", 1, 0, 0, "")';
+                            const insertUserDetailsQuery = 'INSERT INTO user_details (user_id, nickname, level, experience, skill_point, inventory) VALUES (?, "NONAME", 1, 0, 0, "")';
                             db.query(insertUserDetailsQuery, [userId], (insertUserDetailsErr) => {
                                 if (insertUserDetailsErr) {
                                     console.error('Error inserting user details:', insertUserDetailsErr);
@@ -140,7 +141,7 @@ app.post('/login', (req, res) => {
                     });
                 }
                 function processUserGoods() {
-                    const checkUserGoodsQuery = 'SELECT * FROM USER_ITEM_GOODS WHERE USER_ID = ?';
+                    const checkUserGoodsQuery = 'SELECT * FROM user_item_goods WHERE user_id = ?';
                     db.query(checkUserGoodsQuery, [userId], (checkUserGoodsErr, userGoodsResults) => {
                         if (checkUserGoodsErr) {
                             return db.rollback(() => {
@@ -149,7 +150,7 @@ app.post('/login', (req, res) => {
                         }
 
                         if (userGoodsResults.length === 0) {
-                            const insertUserGoodsQuery = 'INSERT INTO USER_ITEM_GOODS (USER_ID, GOLD, JEWEL, TICKET_WEAPON, TICKET_ARMOR) VALUES (?, 0, 0, 0, 0)';
+                            const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel,ticket_weapon, ticket_armor) VALUES (?, 0, 0, 0, 0)';
                             db.query(insertUserGoodsQuery, [userId], (insertUserGoodsErr) => {
                                 if (insertUserGoodsErr) {
                                     return db.rollback(() => {
@@ -165,7 +166,7 @@ app.post('/login', (req, res) => {
                 }
 
                 function finalizeLogin() {
-                    const detailsQuery = 'SELECT USER_ID, NICKNAME, LEVEL, EXPERIENCE, SKILL_POINT, INVENTORY FROM USER_DETAILS WHERE USER_ID = ?';
+                    const detailsQuery = 'SELECT user_id, nickname, level, experience, skill_point, inventory FROM user_details WHERE user_id = ?';
                     db.query(detailsQuery, [userId], (detailsErr, detailsResults) => {
                         if (detailsErr) {
                             return db.rollback(() => {
@@ -173,7 +174,7 @@ app.post('/login', (req, res) => {
                             });
                         }
 
-                        const goodsQuery = 'SELECT * FROM USER_ITEM_GOODS WHERE USER_ID = ?';
+                        const goodsQuery = 'SELECT * FROM user_item_goods WHERE user_id = ?';
                         db.query(goodsQuery, [userId], (goodsErr, goodsResults) => {
                             if (goodsErr) {
                                 return db.rollback(() => {
@@ -209,10 +210,11 @@ app.post('/login', (req, res) => {
 
 
 app.post('/createUserDetails', (req, res) => {
+    console.log('Received request:', req.body);
     const { userId } = req.body;
 
-    const checkUserDetailsQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
-    const checkUserGoodsQuery = 'SELECT * FROM USER_ITEM_GOODS WHERE USER_ID = ?';
+    const checkUserDetailsQuery = 'SELECT * FROM user_details WHERE user_id = ?';
+    const checkUserGoodsQuery = 'SELECT * FROM user_item_goods WHERE user_id = ?';
 
     db.beginTransaction(transactionErr => {
         if (transactionErr) {
@@ -236,8 +238,8 @@ app.post('/createUserDetails', (req, res) => {
                 const userDetailsExists = checkUserDetailsResults.length > 0;
                 const userGoodsExists = checkUserGoodsResults.length > 0;
 
-                const insertUserDetailsQuery = 'INSERT INTO USER_DETAILS (USER_ID, NICKNAME, LEVEL, EXPERIENCE, INVENTORY) VALUES (?, "NONAME", 1, 0, "")';
-                const insertUserGoodsQuery = 'INSERT INTO USER_ITEM_GOODS (USER_ID, GOLD, JEWEL, TICKET_WEAPON, TICKET_ARMOR) VALUES (?, 100, 100, 1, 1)';
+                const insertUserDetailsQuery = 'INSERT INTO user_details (user_id, nickname, level, experience,inventory) VALUES (?, "NONAME", 1, 0, "")';
+                const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel, ticket_weapn, ticket_armor) VALUES (?, 100, 100, 1, 1)';
 
                 const queries = [];
 
@@ -295,16 +297,17 @@ app.post('/createUserDetails', (req, res) => {
     });
 });
 
-const detailsColumns = ['LEVEL', 'EXPERIENCE', 'SKILL_POINT'];
+const detailsColumns = ['level', 'experience', 'skill_point'];
 
 app.post('/updateUserDetails', (req, res) => {
+    console.log('Received request:', req.body);
     const { userId, column, value } = req.body;
 
     if (!detailsColumns.includes(column)) {
         return res.status(400).json({ error: 'Invalid column name' });
     }
 
-    const checkQuery = 'SELECT * FROM USER_DETAILS WHERE USER_ID = ?';
+    const checkQuery = 'SELECT * FROM user_details WHERE user_id = ?';
     db.query(checkQuery, [userId], (checkErr, checkResults) => {
         if (checkErr) {
             return res.json({ success: false, message: 'Database query error update detail Query' });
@@ -314,7 +317,7 @@ app.post('/updateUserDetails', (req, res) => {
             return res.json({ success: false, message: 'User not found' });
         }
 
-        const query = `UPDATE USER_DETAILS SET ${mysql.escapeId(column)} = ? WHERE USER_ID = ?`;
+        const query = `UPDATE user_details SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`;
         db.query(query, [value, userId], (err, result) => {
             if (err) {
                 return res.json({ success: false, message: 'Failed to update user details' });
@@ -324,16 +327,17 @@ app.post('/updateUserDetails', (req, res) => {
     });
 });
 
-const goodsColumns = ['GOLD', 'JEWEL', 'TICKET_WEAPON', 'TICKET_ARMOR'];
+const goodsColumns = ['gold', 'jewel', 'ticket_weapon', 'ticket_armor'];
 
 app.post('/updateUserGoods', (req, res) => {
+    console.log('Received request:', req.body);
     const { userId, column, value } = req.body;
 
     if (!goodsColumns.includes(column)) {
         return res.status(400).json({ error: 'Invalid column name' });
     }
 
-    const checkQuery = 'SELECT * FROM USER_ITEM_GOODS WHERE USER_ID = ?';
+    const checkQuery = 'SELECT * FROM user_item_goods WHERE user_id = ?';
     db.query(checkQuery, [userId], (checkErr, checkResults) => {
         if (checkErr) {
             return res.json({ success: false, message: 'Database query error update goods Query' });
@@ -343,7 +347,7 @@ app.post('/updateUserGoods', (req, res) => {
             return res.json({ success: false, message: 'User not found' });
         }
 
-        const query = `UPDATE USER_ITEM_GOODS SET ${mysql.escapeId(column)} = ? WHERE USER_ID = ?`;
+        const query = `UPDATE user_item_goods SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`;
         db.query(query, [value, userId], (err, result) => {
             if (err) {
                 return res.json({ success: false, message: 'Failed to update user goods' });
@@ -354,8 +358,9 @@ app.post('/updateUserGoods', (req, res) => {
 });
 
 app.post('/loadWeaponData', (req, res) => {
+    console.log('Received request:', req.body);
     const userId = req.body.userId;
-    let sql = 'SELECT WeaponID, WeaponCount FROM user_item_weapon WHERE USER_ID = ?';
+    let sql = 'SELECT weapon_id, weapon_point FROM user_item_weapon WHERE user_id = ?';
     db.query(sql, [userId], (err, result) => {
       if (err) {
         res.status(500).send('Error fetching data from database');
@@ -366,6 +371,8 @@ app.post('/loadWeaponData', (req, res) => {
 });
 
 app.post('/uploadWeaponData', async (req, res) => {
+    console.log('Received request:', req.body);
+
     const { USER_ID, weapons } = req.body;
 
     db.beginTransaction(async transactionErr => {
@@ -376,15 +383,15 @@ app.post('/uploadWeaponData', async (req, res) => {
 
         try {
             for (const weapon of weapons) {
-                const { WeaponID, WeaponCount } = weapon;
+                const { weapon_id, weapon_count } = weapon;
                 const query = `
-                    INSERT INTO user_item_weapon (USER_ID, WeaponID, WeaponCount)
+                    INSERT INTO user_item_weapon (user_id, weapon_id, weapon_count)
                     VALUES (?, ?, ?)
-                    ON DUPLICATE KEY UPDATE WeaponCount = VALUES(WeaponCount)
+                    ON DUPLICATE KEY UPDATE weapon_count = VALUES(weapon_count)
                 `;
 
                 await new Promise((resolve, reject) => {
-                    db.query(query, [USER_ID, WeaponID, WeaponCount], (err, result) => {
+                    db.query(query, [user_id, weapon_id, weapon_count], (err, result) => {
                         if (err) {
                             return reject(err);
                         }
@@ -412,6 +419,8 @@ app.post('/uploadWeaponData', async (req, res) => {
 });
 
 app.post('/gacha', (req, res) => {
+    console.log('Received request:', req.body);
+    
     const userId = req.body.userId;
     const count = req.body.count;
     const result = {};
@@ -427,19 +436,19 @@ app.post('/gacha', (req, res) => {
 
     // 데이터베이스에 저장
     for (const [weaponId, weaponCount] of Object.entries(result)) {
-        db.query(`SELECT WeaponCount FROM user_item_weapon WHERE USER_ID = ? AND WeaponID = ?`, [userId, weaponId], (err, rows) => {
+        db.query(`SELECT weapon_count FROM user_item_weapon WHERE user_id = ? AND weapon_id = ?`, [userId, weaponId], (err, rows) => {
             if (err) {
                 console.error('Error querying database:', err);
                 return;
             }
             if (rows.length > 0) {
-                db.query(`UPDATE user_item_weapon SET WeaponCount = WeaponCount + ? WHERE USER_ID = ? AND WeaponID = ?`, [weaponCount, userId, weaponId], err => {
+                db.query(`UPDATE user_item_weapon SET weapon_count = weapon_count + ? WHERE user_id = ? AND weapon_id = ?`, [weaponCount, userId, weaponId], err => {
                     if (err) {
                         console.error('Error updating database:', err);
                     }
                 });
             } else {
-                db.query(`INSERT INTO user_item_weapon (USER_ID, WeaponID, WeaponCount) VALUES (?, ?, ?)`, [userId, weaponId, weaponCount], err => {
+                db.query(`INSERT INTO user_item_weapon (user_id, weapon_id, weapon_count) VALUES (?, ?, ?)`, [userId, weaponId, weaponCount], err => {
                     if (err) {
                         console.error('Error inserting into database:', err);
                     }
