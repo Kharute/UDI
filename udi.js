@@ -387,8 +387,7 @@ app.post('/loadWeaponData', (req, res) => {
 
 app.post('/uploadWeaponData', async (req, res) => {
     console.log('Received request:', req.body);
-
-    const { USER_ID, weapons } = req.body;
+    const { user_id, weapons } = req.body;
 
     db.beginTransaction(async transactionErr => {
         if (transactionErr) {
