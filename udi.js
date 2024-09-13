@@ -10,7 +10,7 @@ const port = 7777;
 
 // MySQL 연결 설정
 const db = mysql.createConnection({
-    host: 'localhost',
+    host: '15.165.15.237',
     user: 'root',
     password: '1234',
     database: 'UDI'
@@ -451,5 +451,5 @@ app.post('/gacha', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on http://${db.mysql.host}:${port}`);
 });
