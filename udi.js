@@ -59,7 +59,7 @@ app.post('/login', (req, res) => {
         return res.json({ success: false, message: 'Please provide username and password' });
     }
 
-    const query = 'SELECT user_id, login_count_month, login_isfirst, login_date FROM user_login WHERE user_name = ? AND password = ?';
+    const query = 'SELECT user_id, login_count_month, login_isfirst, login_date, login_time FROM user_login WHERE user_name = ? AND password = ?';
     db.query(query, [username, password], (err, results) => {
         if (err) {
             console.error('Database query error:', err);
@@ -67,11 +67,11 @@ app.post('/login', (req, res) => {
         }
 
         if (results.length > 0) {
-            const userId = results[0].USER_ID;
-            let loginCountMonth = results[0].LOGIN_COUNT_MONTH;
-            let loginIsFirst = false;
-            const lastLoginDate = results[0].LOGIN_DATE ? new Date(results[0].LOGIN_DATE) : null;
-            const currentTime = new Date();
+            const userId = results[0].user_id;
+            let loginCountMonth = results[0].login_count_month;
+            let loginIsFirst = login_isfirst;
+            const lastLoginDate = results[0].login_date ? new Date(results[0].login_date) : null;
+            const currentTime = login_time;
             const currentHour = currentTime.getHours();
 
             db.beginTransaction(transactionErr => {
