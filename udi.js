@@ -67,12 +67,16 @@ app.post('/login', (req, res) => {
         }
 
         if (results.length > 0) {
-            const userId = results[0].USER_ID;
-            let loginCountMonth = results[0].login_count_month;
+            const userId = results[0].user_id;
+            let loginCountMonth = results[0].login_count_month || 0;
             let loginIsFirst = results[0].login_isfirst;
             const lastLoginDate = results[0].login_date ? new Date(results[0].login_date) : null;
-            const currentTime = results[0].login_time;
-            const currentHour = currentTime.getHours();
+            const lastLoginTime = results[0].login_time;
+            const currentTime = new Date();
+
+            if (!userId) {
+                return res.json({ success: false, message: 'Invalid user ID' });
+            }
 
             db.beginTransaction(transactionErr => {
                 if (transactionErr) {
@@ -94,6 +98,7 @@ app.post('/login', (req, res) => {
                         loginCountMonth = 0;
                     }
 
+                    const currentHour = currentTime.getHours();
                     if (currentHour >= 6 && (!lastLoginDate || lastLoginDate.toDateString() !== currentTime.toDateString())) {
                         const incrementLoginCountQuery = 'UPDATE user_login SET login_count_month = ?, login_isfirst = 1 WHERE user_id = ?';
                         db.query(incrementLoginCountQuery, [loginCountMonth + 1, userId], (incrementCountErr) => {
