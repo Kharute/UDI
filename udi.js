@@ -43,7 +43,7 @@ fs.readFile(xmlFilePath, (err, data) => {
         }
         // 무기 데이터를 배열로 변환
         weaponList = result.WeaponInfo.dataCategory.data.map(w => ({
-            id: parseInt(w.$.WeaponID),
+            id: parseInt(w.$.weapon_id),
             name: w.$.WeaponName
         }));
         console.log('Loaded weaponList:', weaponList);
@@ -239,7 +239,7 @@ app.post('/createUserDetails', (req, res) => {
                 const userGoodsExists = checkUserGoodsResults.length > 0;
 
                 const insertUserDetailsQuery = 'INSERT INTO user_details (user_id, nickname, level, experience, inventory) VALUES (?, "NONAME", 1, 0, "")';
-                const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel, ticket_weapㅐn, ticket_armor) VALUES (?, 100, 100, 1, 1)';
+                const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel, ticket_weapon, ticket_armor) VALUES (?, 100, 100, 1, 1)';
 
                 const queries = [];
 
