@@ -78,7 +78,7 @@ app.post('/login', (req, res) => {
                     return res.json({ success: false, message: 'Failed to start transaction' });
                 }
 
-                const updateLoginTimeQuery = 'UPDATE user_logion SET login_time = ?, login_date = ? WHERE user_id = ?';
+                const updateLoginTimeQuery = 'UPDATE user_login SET login_time = ?, login_date = ? WHERE user_id = ?';
                 db.query(updateLoginTimeQuery, [currentTime, currentTime, userId], (updateTimeErr) => {
                     if (updateTimeErr) {
                         return db.rollback(() => {
@@ -239,7 +239,7 @@ app.post('/createUserDetails', (req, res) => {
                 const userGoodsExists = checkUserGoodsResults.length > 0;
 
                 const insertUserDetailsQuery = 'INSERT INTO user_details (user_id, nickname, level, experience, inventory) VALUES (?, "NONAME", 1, 0, "")';
-                const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel, ticket_weapn, ticket_armor) VALUES (?, 100, 100, 1, 1)';
+                const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel, ticket_weapㅐn, ticket_armor) VALUES (?, 100, 100, 1, 1)';
 
                 const queries = [];
 
