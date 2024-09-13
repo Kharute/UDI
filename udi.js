@@ -62,6 +62,7 @@ app.post('/login', (req, res) => {
     const query = 'SELECT user_id, login_count_month, login_isfirst, login_date FROM user_login WHERE user_name = ? AND password = ?';
     db.query(query, [username, password], (err, results) => {
         if (err) {
+            console.error('Database query error:', err);
             return res.json({ success: false, message: 'Database query error to login' });
         }
 
@@ -75,12 +76,14 @@ app.post('/login', (req, res) => {
 
             db.beginTransaction(transactionErr => {
                 if (transactionErr) {
+                    console.error('Transaction error:', transactionErr);
                     return res.json({ success: false, message: 'Failed to start transaction' });
                 }
 
                 const updateLoginTimeQuery = 'UPDATE user_login SET login_time = ?, login_date = ? WHERE user_id = ?';
                 db.query(updateLoginTimeQuery, [currentTime, currentTime, userId], (updateTimeErr) => {
                     if (updateTimeErr) {
+                        console.error('Update login time error:', updateTimeErr);
                         return db.rollback(() => {
                             res.json({ success: false, message: 'Failed to update login time' });
                         });
@@ -95,6 +98,7 @@ app.post('/login', (req, res) => {
                         const incrementLoginCountQuery = 'UPDATE user_login SET login_count_month = ?, login_isfirst = 1 WHERE user_id = ?';
                         db.query(incrementLoginCountQuery, [loginCountMonth + 1, userId], (incrementCountErr) => {
                             if (incrementCountErr) {
+                                console.error('Increment login count error:', incrementCountErr);
                                 return db.rollback(() => {
                                     res.json({ success: false, message: 'Failed to increment login count' });
                                 });
@@ -140,19 +144,22 @@ app.post('/login', (req, res) => {
                         }
                     });
                 }
+
                 function processUserGoods() {
                     const checkUserGoodsQuery = 'SELECT * FROM user_item_goods WHERE user_id = ?';
                     db.query(checkUserGoodsQuery, [userId], (checkUserGoodsErr, userGoodsResults) => {
                         if (checkUserGoodsErr) {
+                            console.error('Error checking user goods:', checkUserGoodsErr);
                             return db.rollback(() => {
                                 res.json({ success: false, message: 'Failed to check user goods' });
                             });
                         }
 
                         if (userGoodsResults.length === 0) {
-                            const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel,ticket_weapon, ticket_armor) VALUES (?, 0, 0, 0, 0)';
+                            const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel, ticket_weapon, ticket_armor) VALUES (?, 0, 0, 0, 0)';
                             db.query(insertUserGoodsQuery, [userId], (insertUserGoodsErr) => {
                                 if (insertUserGoodsErr) {
+                                    console.error('Error inserting user goods:', insertUserGoodsErr);
                                     return db.rollback(() => {
                                         res.json({ success: false, message: 'Failed to create user goods' });
                                     });
@@ -169,6 +176,7 @@ app.post('/login', (req, res) => {
                     const detailsQuery = 'SELECT user_id, nickname, level, experience, skill_point, inventory FROM user_details WHERE user_id = ?';
                     db.query(detailsQuery, [userId], (detailsErr, detailsResults) => {
                         if (detailsErr) {
+                            console.error('Error retrieving user details:', detailsErr);
                             return db.rollback(() => {
                                 res.json({ success: false, message: 'Failed to retrieve user details' });
                             });
@@ -177,6 +185,7 @@ app.post('/login', (req, res) => {
                         const goodsQuery = 'SELECT * FROM user_item_goods WHERE user_id = ?';
                         db.query(goodsQuery, [userId], (goodsErr, goodsResults) => {
                             if (goodsErr) {
+                                console.error('Error retrieving user goods:', goodsErr);
                                 return db.rollback(() => {
                                     res.json({ success: false, message: 'Failed to retrieve user item goods' });
                                 });
@@ -184,6 +193,7 @@ app.post('/login', (req, res) => {
 
                             db.commit(commitErr => {
                                 if (commitErr) {
+                                    console.error('Error committing transaction:', commitErr);
                                     return db.rollback(() => {
                                         res.json({ success: false, message: 'Failed to commit transaction' });
                                     });
