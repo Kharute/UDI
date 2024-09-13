@@ -238,7 +238,7 @@ app.post('/createUserDetails', (req, res) => {
                 const userDetailsExists = checkUserDetailsResults.length > 0;
                 const userGoodsExists = checkUserGoodsResults.length > 0;
 
-                const insertUserDetailsQuery = 'INSERT INTO user_details (user_id, nickname, level, experience,inventory) VALUES (?, "NONAME", 1, 0, "")';
+                const insertUserDetailsQuery = 'INSERT INTO user_details (user_id, nickname, level, experience, inventory) VALUES (?, "NONAME", 1, 0, "")';
                 const insertUserGoodsQuery = 'INSERT INTO user_item_goods (user_id, gold, jewel, ticket_weapn, ticket_armor) VALUES (?, 100, 100, 1, 1)';
 
                 const queries = [];
@@ -360,7 +360,7 @@ app.post('/updateUserGoods', (req, res) => {
 app.post('/loadWeaponData', (req, res) => {
     console.log('Received request:', req.body);
     const userId = req.body.userId;
-    let sql = 'SELECT weapon_id, weapon_point FROM user_item_weapon WHERE user_id = ?';
+    let sql = 'SELECT weapon_id, weapon_count FROM user_item_weapon WHERE user_id = ?';
     db.query(sql, [userId], (err, result) => {
       if (err) {
         res.status(500).send('Error fetching data from database');
