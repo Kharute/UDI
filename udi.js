@@ -18,6 +18,7 @@ const logger = winston.createLogger({
         winston.format.json()
     ),
     transports: [
+        new winston.transports.Console(), // 콘솔 출력 추가
         new winston.transports.File({ filename: 'error.log', level: 'error' }),
         new winston.transports.File({ filename: 'combined.log' })
     ]
@@ -28,16 +29,21 @@ const dbConfig = {
     host: 'localhost',
     user: 'root',
     password: '1234',
-    database: 'UDI'
+    database: 'UDI',
+    connectionLimit: 10,
+    connectTimeout: 10000, // 10초
 };
+
 
 let db;
 
 async function connectToDatabase() {
     try {
-        db = await mysql.createConnection(dbConfig);
+        db = await mysql.createPool(dbConfig);
+        console.log('MySQL connected...');
         logger.info('MySQL connected...');
     } catch (err) {
+        console.error('Error connecting to MySQL:', err);
         logger.error('Error connecting to MySQL:', err);
         setTimeout(connectToDatabase, 5000); // 5초 후 재연결 시도
     }
@@ -282,13 +288,18 @@ app.post('/gacha', async (req, res) => {
 });
 
 // 서버 시작
-function startServer() {
-    app.listen(port, () => {
-        logger.info(`Server running on http://${ip}:${port}`);
-    }).on('error', (err) => {
+async function startServer() {
+    try {
+        await connectToDatabase();
+        app.listen(port, () => {
+            console.log(`Server running on http://${ip}:${port}`);
+            logger.info(`Server running on http://${ip}:${port}`);
+        });
+    } catch (err) {
+        console.error('Error starting server:', err);
         logger.error('Error starting server:', err);
         setTimeout(startServer, 5000); // 5초 후 서버 재시작 시도
-    });
+    }
 }
 
 startServer();
