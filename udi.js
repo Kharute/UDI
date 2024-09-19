@@ -125,6 +125,7 @@ app.post('/login', async (req, res) => {
 
             await db.commit();
 
+            logger.info('Login successfully');
             res.json({
                 success: true,
                 message: 'Login successful',
@@ -164,6 +165,7 @@ app.post('/createUserDetails', async (req, res) => {
         }
 
         await db.commit();
+        logger.info('Updated successfully');
         res.json({ success: true, message: 'User details and item goods created or updated successfully' });
     } catch (error) {
         await db.rollback();
@@ -181,7 +183,6 @@ app.post('/updateUserDetails', async (req, res) => {
     if (!detailsColumns.includes(column)) {
         return res.status(400).json({ success: false, message: 'Invalid column name' });
     }
-    
     let db;
     try {
         db = await dbConnect.getConnection();
@@ -191,6 +192,7 @@ app.post('/updateUserDetails', async (req, res) => {
         }
 
         const [result] = await db.query(`UPDATE user_details SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
+        logger.info('Updated successfully');
         res.json({ success: true, message: 'Update successful', result });
     } catch (error) {
         logger.error('Error in updateUserDetails:', error);
@@ -217,6 +219,7 @@ app.post('/updateUserGoods', async (req, res) => {
         }
 
         const [result] = await db.query(`UPDATE user_item_goods SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
+        logger.info('Updated successfully');
         res.json({ success: true, message: 'Update successful', result });
     } catch (error) {
         logger.error('Error in updateUserGoods:', error);
@@ -231,6 +234,7 @@ app.post('/loadWeaponData', async (req, res) => {
     try {
         db = await dbConnect.getConnection();
         const [results] = await db.query('SELECT weapon_id, weapon_count FROM user_item_weapon WHERE user_id = ?', [userId]);
+        logger.info('Weapons updated successfully');
         res.json(results);
     } catch (error) {
         logger.error('Error in loadWeaponData:', error);
@@ -256,6 +260,7 @@ app.post('/uploadWeaponData', async (req, res) => {
         }
 
         await db.commit();
+        logger.info('Data updated successfully');
         res.json({ success: true, message: 'Data updated successfully' });
     } catch (error) {
         await db.rollback();
@@ -268,15 +273,16 @@ app.post('/uploadWeaponData', async (req, res) => {
 app.post('/gacha', async (req, res) => {
     const { userId, count } = req.body;
     const result = {};
+    
     let db;
     try {
         db = await dbConnect.getConnection();
+        await db.beginTransaction();
+
         for (let i = 0; i < count; i++) {
             const randomWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
             result[randomWeapon.id] = (result[randomWeapon.id] || 0) + 1;
         }
-
-        await db.beginTransaction();
 
         for (const [weaponId, weaponCount] of Object.entries(result)) {
             await db.query(`
@@ -287,6 +293,7 @@ app.post('/gacha', async (req, res) => {
         }
 
         await db.commit();
+        logger.info('Gacha updated successfully');
         res.json({ success: true, result });
     } catch (error) {
         await db.rollback();
