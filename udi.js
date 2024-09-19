@@ -124,8 +124,7 @@ app.post('/login', async (req, res) => {
             const [finalUserGoods] = await db.query('SELECT * FROM user_item_goods WHERE user_id = ?', [userId]);
 
             await db.commit();
-
-            logger.info('Login successfully');
+            logger.info(`Login : ${username}`);
             res.json({
                 success: true,
                 message: 'Login successful',
@@ -165,7 +164,8 @@ app.post('/createUserDetails', async (req, res) => {
         }
 
         await db.commit();
-        logger.info('Updated successfully');
+        logger.info(`Create UserDetails : ${userDetails}`);
+        //logger.info('UserDetails Updated successfully');
         res.json({ success: true, message: 'User details and item goods created or updated successfully' });
     } catch (error) {
         await db.rollback();
@@ -192,7 +192,7 @@ app.post('/updateUserDetails', async (req, res) => {
         }
 
         const [result] = await db.query(`UPDATE user_details SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
-        logger.info('Updated successfully');
+        logger.info(`UserDetails Fixed : ${userDetails}`);
         res.json({ success: true, message: 'Update successful', result });
     } catch (error) {
         logger.error('Error in updateUserDetails:', error);
@@ -260,7 +260,7 @@ app.post('/uploadWeaponData', async (req, res) => {
         }
 
         await db.commit();
-        logger.info('Data updated successfully');
+        logger.info('WeaponData Updated successful');
         res.json({ success: true, message: 'Data updated successfully' });
     } catch (error) {
         await db.rollback();
