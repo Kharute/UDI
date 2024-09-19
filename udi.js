@@ -164,7 +164,7 @@ app.post('/createUserDetails', async (req, res) => {
         }
 
         await db.commit();
-        logger.info(`Create UserDetails : ${userDetails}`);
+        logger.info(`Create UserDetails successful`);
         //logger.info('UserDetails Updated successfully');
         res.json({ success: true, message: 'User details and item goods created or updated successfully' });
     } catch (error) {
@@ -192,7 +192,7 @@ app.post('/updateUserDetails', async (req, res) => {
         }
 
         const [result] = await db.query(`UPDATE user_details SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
-        logger.info(`UserDetails Fixed : ${userDetails}`);
+        logger.info(`UserDetails Fixed successfully`);
         res.json({ success: true, message: 'Update successful', result });
     } catch (error) {
         logger.error('Error in updateUserDetails:', error);
