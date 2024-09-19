@@ -181,8 +181,10 @@ app.post('/updateUserDetails', async (req, res) => {
     if (!detailsColumns.includes(column)) {
         return res.status(400).json({ success: false, message: 'Invalid column name' });
     }
-
+    
+    let db;
     try {
+        db = await dbConnect.getConnection();
         const [results] = await db.query('SELECT * FROM user_details WHERE user_id = ?', [userId]);
         if (results.length === 0) {
             return res.json({ success: false, message: 'User not found' });
@@ -206,7 +208,9 @@ app.post('/updateUserGoods', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Invalid column name' });
     }
 
+    let db;
     try {
+        db = await dbConnect.getConnection();
         const [results] = await db.query('SELECT * FROM user_item_goods WHERE user_id = ?', [userId]);
         if (results.length === 0) {
             return res.json({ success: false, message: 'User not found' });
@@ -223,8 +227,9 @@ app.post('/updateUserGoods', async (req, res) => {
 // 무기 데이터 로드
 app.post('/loadWeaponData', async (req, res) => {
     const { userId } = req.body;
-
+    let db;
     try {
+        db = await dbConnect.getConnection();
         const [results] = await db.query('SELECT weapon_id, weapon_count FROM user_item_weapon WHERE user_id = ?', [userId]);
         res.json(results);
     } catch (error) {
