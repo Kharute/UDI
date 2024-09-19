@@ -34,22 +34,18 @@ const dbConfig = {
     connectTimeout: 10000, // 10초
 };
 
-
-let db;
+let dbConnect;
 
 async function connectToDatabase() {
     try {
-        db = await mysql.createPool(dbConfig);
-        console.log('MySQL connected...');
+        dbConnect = await mysql.createPool(dbConfig);
+        
         logger.info('MySQL connected...');
     } catch (err) {
-        console.error('Error connecting to MySQL:', err);
         logger.error('Error connecting to MySQL:', err);
         setTimeout(connectToDatabase, 5000); // 5초 후 재연결 시도
     }
 }
-
-connectToDatabase();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -73,6 +69,7 @@ async function loadXMLFile() {
 }
 
 loadXMLFile();
+connectToDatabase();
 
 // 로그인 처리
 app.post('/login', async (req, res) => {
@@ -82,7 +79,9 @@ app.post('/login', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Please provide username and password' });
     }
 
+    let db;
     try {
+        db = await dbConnect.getConnection();
         const [results] = await db.query('SELECT user_id, login_count_month, login_isfirst, login_date, login_time FROM user_login WHERE user_name = ? AND password = ?', [username, password]);
 
         if (results.length === 0) {
@@ -148,7 +147,9 @@ app.post('/login', async (req, res) => {
 app.post('/createUserDetails', async (req, res) => {
     const { userId } = req.body;
 
+    let db;
     try {
+        db = await dbConnect.getConnection();
         await db.beginTransaction();
 
         const [userDetails] = await db.query('SELECT * FROM user_details WHERE user_id = ?', [userId]);
@@ -235,8 +236,9 @@ app.post('/loadWeaponData', async (req, res) => {
 // 무기 데이터 업로드
 app.post('/uploadWeaponData', async (req, res) => {
     const { user_id, weapons } = req.body;
-
+    let db;
     try {
+        db = await dbConnect.getConnection();
         await db.beginTransaction();
 
         for (const weapon of weapons) {
@@ -261,8 +263,9 @@ app.post('/uploadWeaponData', async (req, res) => {
 app.post('/gacha', async (req, res) => {
     const { userId, count } = req.body;
     const result = {};
-
+    let db;
     try {
+        db = await dbConnect.getConnection();
         for (let i = 0; i < count; i++) {
             const randomWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
             result[randomWeapon.id] = (result[randomWeapon.id] || 0) + 1;
@@ -292,11 +295,9 @@ async function startServer() {
     try {
         await connectToDatabase();
         app.listen(port, () => {
-            console.log(`Server running on http://${ip}:${port}`);
             logger.info(`Server running on http://${ip}:${port}`);
         });
     } catch (err) {
-        console.error('Error starting server:', err);
         logger.error('Error starting server:', err);
         setTimeout(startServer, 5000); // 5초 후 서버 재시작 시도
     }
