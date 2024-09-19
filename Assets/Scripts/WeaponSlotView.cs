@@ -57,10 +57,16 @@ public class WeaponSlotView : MonoBehaviour
             var Icon_path = $"Icons/{weaponItemData.Icon}";
             Image_Icon.sprite = Resources.Load<Sprite>(Icon_path);
             Text_Tier.text = weaponInfoList[weaponId].Tier.ToString();
-            
-            if (weaponList.ContainsKey(weaponId))
+
+            bool isLoaded = weaponList != null;
+            if (isLoaded)
             {
-                Text_Count.text = weaponList[weaponId].ToString();
+                bool isContains = weaponList.ContainsKey(weaponId);
+
+                if (isContains)
+                {
+                    Text_Count.text = weaponList[weaponId].ToString();
+                }
             }
             else
             {

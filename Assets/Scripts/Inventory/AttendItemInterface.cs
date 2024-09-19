@@ -27,18 +27,6 @@ public class AttendItemInterface : UserInterface
             var obj = Instantiate(inventoryPrefab, gridLayoutGroup.transform.position, Quaternion.identity, transform);
             itemsDisplayed.Add(obj, AttendItem.Value);
         }
-
-        /*for (int i = 0; i < inventory.Container.Items.Length; i++)
-        {
-            var obj = Instantiate(inventoryPrefab, gridLayoutGroup.transform.position, Quaternion.identity, transform);
-            itemsDisplayed.Add(obj, inventory.Container.Items[i]);
-
-            *//*AddEvent(obj, EventTriggerType.PointerEnter, delegate { OnEnter(obj); });
-            AddEvent(obj, EventTriggerType.PointerExit, delegate { OnExit(obj); });
-            AddEvent(obj, EventTriggerType.BeginDrag, delegate { OnDragStart(obj); });
-            AddEvent(obj, EventTriggerType.EndDrag, delegate { OnDragEnd(obj); });
-            AddEvent(obj, EventTriggerType.Drag, delegate { OnDrag(obj); });*//*
-        }*/
     }
 
     public override void UpdateSlots()
@@ -51,9 +39,6 @@ public class AttendItemInterface : UserInterface
             GameObject IconObj = _slot.Key.transform.GetChild(0).gameObject;
             GameObject BlerImg = _slot.Key.transform.GetChild(2).gameObject;
             Image iconImage = IconObj.GetComponent<Image>();
-
-            /*ItemKey itemKey = new ItemKey();
-            itemKey.SetItemKey(_slot.Value.ItemID, ItemType.Goods);*/
 
             if (GameDataManager.Inst.GoodsItemInfoList != null)
             {

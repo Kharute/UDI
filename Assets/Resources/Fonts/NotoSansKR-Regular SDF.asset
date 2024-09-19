@@ -22,7 +22,8 @@ Texture2D:
   m_MipCount: 1
   m_IsReadable: 1
   m_IsPreProcessed: 0
-  m_IgnoreMasterTextureLimit: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_VTOnly: 0
@@ -522,6 +523,21 @@ MonoBehaviour:
       m_Y: 10
       m_Width: 49
       m_Height: 6
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+  - m_Index: 66
+    m_Metrics:
+      m_Width: 38.15625
+      m_Height: 51.296875
+      m_HorizontalBearingX: 5.3125
+      m_HorizontalBearingY: 50.125
+      m_HorizontalAdvance: 50.671875
+    m_GlyphRect:
+      m_X: 975
+      m_Y: 10
+      m_Width: 39
+      m_Height: 53
     m_Scale: 1
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
@@ -1995,21 +2011,6 @@ MonoBehaviour:
     m_Scale: 1
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
-  - m_Index: 66
-    m_Metrics:
-      m_Width: 38.15625
-      m_Height: 51.296875
-      m_HorizontalBearingX: 5.3125
-      m_HorizontalBearingY: 50.125
-      m_HorizontalAdvance: 50.671875
-    m_GlyphRect:
-      m_X: 975
-      m_Y: 10
-      m_Width: 39
-      m_Height: 53
-    m_Scale: 1
-    m_AtlasIndex: 0
-    m_ClassDefinitionType: 0
   m_CharacterTable:
   - m_ElementType: 1
     m_Unicode: 32
@@ -2126,6 +2127,10 @@ MonoBehaviour:
   - m_ElementType: 1
     m_Unicode: 95
     m_GlyphIndex: 64
+    m_Scale: 1
+  - m_ElementType: 1
+    m_Unicode: 97
+    m_GlyphIndex: 66
     m_Scale: 1
   - m_ElementType: 1
     m_Unicode: 99
@@ -2518,10 +2523,6 @@ MonoBehaviour:
   - m_ElementType: 1
     m_Unicode: 54924
     m_GlyphIndex: 21155
-    m_Scale: 1
-  - m_ElementType: 1
-    m_Unicode: 97
-    m_GlyphIndex: 66
     m_Scale: 1
   m_AtlasTextures:
   - {fileID: -3616762411077606183}
@@ -3556,23 +3557,23 @@ MonoBehaviour:
   m_FontWeightTable:
   - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: d3392863b5a56e7498db1a60f58792be, type: 2}
-    italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: 6ea334d3923746e44a80638bb1884ac4, type: 2}
-    italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: 6cd2d1a7ea506544782d0df7a76e794d, type: 2}
+  - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
   - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: c006783692c0a5d4c9fd4e068b92a744, type: 2}
+  - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: 3f2fde06fca93294d89922ee1d50b7b5, type: 2}
+  - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: 597896015c67d4047aae1e659816ed3a, type: 2}
+  - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: e39cc2aa1f4b0ec4798535b9870a9866, type: 2}
+  - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
-  - regularTypeface: {fileID: 11400000, guid: 5ecf7392fbe6ea344b8bead7f307c3ec, type: 2}
+  - regularTypeface: {fileID: 0}
+    italicTypeface: {fileID: 0}
+  - regularTypeface: {fileID: 0}
+    italicTypeface: {fileID: 0}
+  - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
   fontWeights: []
   normalStyle: 0
@@ -3590,6 +3591,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: NotoSansKR-Regular Atlas Material
   m_Shader: {fileID: 4800000, guid: 68e6db2ebdc24f95958faec2be5558d6, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -3598,6 +3601,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:

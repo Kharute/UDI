@@ -11,7 +11,6 @@ public class Monster : MonoBehaviour
     #region Fields
 
     [SerializeField] private GameObject projectile;
-    [SerializeField] private float shootSpeed = 800.0f;
     [SerializeField] private Transform spawnPosition;
     [SerializeField] private ParticleSystem stabAttack;
 
