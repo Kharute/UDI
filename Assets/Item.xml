@@ -15,9 +15,9 @@
     <data ClassName="Armor_Clothes" ItemType="Armor" ItemID="2" ItemName="갑옷" Rarity="" Icon="icon_clothes-medieval-fashion_LP" Description="갑옷이다" />
     <data ClassName="Armor_Hand" ItemType="Armor" ItemID="3" ItemName="장갑" Rarity="" Icon="icon_waving_LP" Description="장갑이다" />
     <data ClassName="Armor_Shoes" ItemType="Armor" ItemID="4" ItemName="신발" Rarity="" Icon="icon_letter-T_LP" Description="신발이다" />
-    <data ClassName="GOLD" ItemType="Goods" ItemID="1" ItemName="골드" Rarity="" Icon="icon_coin-crown-gold_LP" Description="골드이다." />
-    <data ClassName="JEWEL" ItemType="Goods" ItemID="2" ItemName="쥬얼" Rarity="" Icon="icon_gem-blue_LP" Description="쥬얼이다." />
-    <data ClassName="TICKET_WEAPON" ItemType="Goods" ItemID="3" ItemName="무기소환권" Rarity="" Icon="icon_book_LP" Description="무기소환권이다." />
-    <data ClassName="TICKET_ARMOR" ItemType="Goods" ItemID="4" ItemName="방어구소환권" Rarity="" Icon="icon_paper-old_LP" Description="방어구소환권이다." />
+    <data ClassName="gold" ItemType="Goods" ItemID="1" ItemName="골드" Rarity="" Icon="icon_coin-crown-gold_LP" Description="골드이다." />
+    <data ClassName="jewel" ItemType="Goods" ItemID="2" ItemName="쥬얼" Rarity="" Icon="icon_gem-blue_LP" Description="쥬얼이다." />
+    <data ClassName="ticket_weapon" ItemType="Goods" ItemID="3" ItemName="무기소환권" Rarity="" Icon="icon_book_LP" Description="무기소환권이다." />
+    <data ClassName="ticket_armor" ItemType="Goods" ItemID="4" ItemName="방어구소환권" Rarity="" Icon="icon_paper-old_LP" Description="방어구소환권이다." />
   </dataCategory>
 </Item>

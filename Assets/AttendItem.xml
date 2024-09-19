@@ -1,33 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AttendItem>
   <dataCategory>
-    <data Day="1" ClassName="GOLD" Amount="200" />
-    <data Day="2" ClassName="GOLD" Amount="200" />
-    <data Day="3" ClassName="JEWEL" Amount="100" />
-    <data Day="4" ClassName="GOLD" Amount="250" />
-    <data Day="5" ClassName="GOLD" Amount="100" />
-    <data Day="6" ClassName="TICKET_WEAPON" Amount="1" />
-    <data Day="7" ClassName="TICKET_ARMOR" Amount="1" />
-    <data Day="8" ClassName="GOLD" Amount="300" />
-    <data Day="9" ClassName="GOLD" Amount="300" />
-    <data Day="10" ClassName="JEWEL" Amount="100" />
-    <data Day="11" ClassName="GOLD" Amount="400" />
-    <data Day="12" ClassName="GOLD" Amount="400" />
-    <data Day="13" ClassName="TICKET_WEAPON" Amount="3" />
-    <data Day="14" ClassName="TICKET_ARMOR" Amount="3" />
-    <data Day="15" ClassName="GOLD" Amount="500" />
-    <data Day="16" ClassName="GOLD" Amount="500" />
-    <data Day="17" ClassName="JEWEL" Amount="150" />
-    <data Day="18" ClassName="GOLD" Amount="600" />
-    <data Day="19" ClassName="GOLD" Amount="600" />
-    <data Day="20" ClassName="TICKET_WEAPON" Amount="5" />
-    <data Day="21" ClassName="TICKET_ARMOR" Amount="5" />
-    <data Day="22" ClassName="GOLD" Amount="700" />
-    <data Day="23" ClassName="GOLD" Amount="700" />
-    <data Day="24" ClassName="JEWEL" Amount="500" />
-    <data Day="25" ClassName="GOLD" Amount="1000" />
-    <data Day="26" ClassName="GOLD" Amount="1000" />
-    <data Day="27" ClassName="TICKET_WEAPON" Amount="10" />
-    <data Day="28" ClassName="TICKET_ARMOR" Amount="10" />
+    <data Day="1" ClassName="gold" Amount="200" />
+    <data Day="2" ClassName="gold" Amount="200" />
+    <data Day="3" ClassName="jewel" Amount="100" />
+    <data Day="4" ClassName="gold" Amount="250" />
+    <data Day="5" ClassName="gold" Amount="100" />
+    <data Day="6" ClassName="ticket_weapon" Amount="1" />
+    <data Day="7" ClassName="ticket_armor" Amount="1" />
+    <data Day="8" ClassName="gold" Amount="300" />
+    <data Day="9" ClassName="gold" Amount="300" />
+    <data Day="10" ClassName="jewel" Amount="100" />
+    <data Day="11" ClassName="gold" Amount="400" />
+    <data Day="12" ClassName="gold" Amount="400" />
+    <data Day="13" ClassName="ticket_weapon" Amount="3" />
+    <data Day="14" ClassName="ticket_armor" Amount="3" />
+    <data Day="15" ClassName="gold" Amount="500" />
+    <data Day="16" ClassName="gold" Amount="500" />
+    <data Day="17" ClassName="jewel" Amount="150" />
+    <data Day="18" ClassName="gold" Amount="600" />
+    <data Day="19" ClassName="gold" Amount="600" />
+    <data Day="20" ClassName="ticket_weapon" Amount="5" />
+    <data Day="21" ClassName="ticket_armor" Amount="5" />
+    <data Day="22" ClassName="gold" Amount="700" />
+    <data Day="23" ClassName="gold" Amount="700" />
+    <data Day="24" ClassName="jewel" Amount="500" />
+    <data Day="25" ClassName="gold" Amount="1000" />
+    <data Day="26" ClassName="gold" Amount="1000" />
+    <data Day="27" ClassName="ticket_weapon" Amount="10" />
+    <data Day="28" ClassName="ticket_armor" Amount="10" />
   </dataCategory>
 </AttendItem>
