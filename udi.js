@@ -402,24 +402,29 @@ app.post('/updateUserGoods', (req, res) => {
     const { userId, column, value } = req.body;
 
     if (!goodsColumns.includes(column)) {
+        console.log('Error: Invalid column name');
         return res.status(400).json({ error: 'Invalid column name' });
     }
 
     const checkQuery = 'SELECT * FROM user_item_goods WHERE user_id = ?';
     db.query(checkQuery, [userId], (checkErr, checkResults) => {
         if (checkErr) {
+            console.log('Error: Database query error update goods Query');
             return res.json({ success: false, message: 'Database query error update goods Query' });
         }
 
         if (checkResults.length === 0) {
+            console.log('User not found');
             return res.json({ success: false, message: 'User not found' });
         }
 
         const query = `UPDATE user_item_goods SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`;
         db.query(query, [value, userId], (err, result) => {
             if (err) {
+                console.log('Error : Failed to update user goods');
                 return res.json({ success: false, message: 'Failed to update user goods' });
             }
+            console.log('Update successful');
             res.json({ message: 'Update successful', result });
         });
     });
