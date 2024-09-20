@@ -194,15 +194,19 @@ app.post('/updateUserDetails', async (req, res) => {
     let db;
     try {
         db = await dbConnect.getConnection();
+        await db.beginTransaction();
         const [results] = await db.query('SELECT * FROM user_details WHERE user_id = ?', [userId]);
         if (results.length === 0) {
             return res.json({ success: false, message: 'User not found' });
         }
 
         const [result] = await db.query(`UPDATE user_details SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
+        
+        await db.commit();
         logger.info('UserDetails Fixed successfully');
         res.json({ success: true, message: 'Update successful', result });
     } catch (error) {
+        await db.rollback();
         logger.error('Error in updateUserDetails:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     } finally {
@@ -225,15 +229,19 @@ app.post('/updateUserGoods', async (req, res) => {
     let db;
     try {
         db = await dbConnect.getConnection();
+        await db.beginTransaction();
         const [results] = await db.query('SELECT * FROM user_item_goods WHERE user_id = ?', [userId]);
         if (results.length === 0) {
             return res.json({ success: false, message: 'User not found' });
         }
 
         const [result] = await db.query(`UPDATE user_item_goods SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
+        
+        await db.commit();
         logger.info('Updated successfully');
         res.json({ success: true, message: 'Update successful', result });
     } catch (error) {
+        await db.rollback();
         logger.error('Error in updateUserGoods:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     } finally {
@@ -249,10 +257,14 @@ app.post('/loadWeaponData', async (req, res) => {
     let db;
     try {
         db = await dbConnect.getConnection();
+        await db.beginTransaction();
         const [results] = await db.query('SELECT weapon_id, weapon_count FROM user_item_weapon WHERE user_id = ?', [userId]);
+
+        await db.commit();
         logger.info('Weapons updated successfully');
         res.json(results);
     } catch (error) {
+        await db.rollback();
         logger.error('Error in loadWeaponData:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     } finally {
