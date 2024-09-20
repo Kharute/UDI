@@ -202,9 +202,13 @@ app.post('/updateUserDetails', async (req, res) => {
 
         const [result] = await db.query(`UPDATE user_details SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
         
+        // 업데이트된 값 확인
+        const [updatedResults] = await db.query('SELECT * FROM user_details WHERE user_id = ?', [userId]);
+        const updatedValue = updatedResults[0][column];
+        
         await db.commit();
-        logger.info('UserDetails Fixed successfully');
-        res.json({ success: true, message: 'Update successful', result });
+        logger.info(`UserDetails Updated successfully. Column: ${column}, New Value: ${updatedValue}`);
+        res.json({ success: true, message: 'Update successful', result, updatedValue });
     } catch (error) {
         await db.rollback();
         logger.error('Error in updateUserDetails:', error);
