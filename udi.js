@@ -103,7 +103,7 @@ app.post('/login', async (req, res) => {
 
             const currentHour = currentTime.getHours();
             if (currentHour >= 6 && (!lastLoginDate || lastLoginDate.toDateString() !== currentTime.toDateString())) {
-                const [{ affectedRows }] = await db.query('UPDATE user_login SET login_count_month = ?, login_isfirst = 1 WHERE user_id = ?', [loginCountMonth + 1, userId]);
+                const [{ affectedRows }] = await db.query('UPDATE user_login SET login_count_month = ?, login_isfirst = 0 WHERE user_id = ?', [loginCountMonth + 1, userId]);
                 if (affectedRows > 0) {
                     loginCountMonth += 1;
                     loginIsFirst = true;
@@ -240,9 +240,10 @@ app.post('/updateUserGoods', async (req, res) => {
         }
 
         const [result] = await db.query(`UPDATE user_item_goods SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
+        await db.query('UPDATE user_login SET login_isfirst = 1 WHERE user_id = ?', [userId]);
         
         await db.commit();
-        logger.info('Updated successfully');
+        logger.info('Updated Goods successfully');
         res.json({ success: true, message: 'Update successful', result });
     } catch (error) {
         await db.rollback();
@@ -265,7 +266,7 @@ app.post('/loadWeaponData', async (req, res) => {
         const [results] = await db.query('SELECT weapon_id, weapon_count FROM user_item_weapon WHERE user_id = ?', [userId]);
 
         await db.commit();
-        logger.info('Weapons updated successfully');
+        logger.info('Weapons Load successfully');
         res.json(results);
     } catch (error) {
         await db.rollback();
@@ -296,7 +297,7 @@ app.post('/uploadWeaponData', async (req, res) => {
         }
 
         await db.commit();
-        logger.info('WeaponData Updated successful');
+        logger.info('Updated WeaponData successful');
         res.json({ success: true, message: 'Data updated successfully' });
     } catch (error) {
         await db.rollback();
