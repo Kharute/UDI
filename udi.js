@@ -103,11 +103,8 @@ app.post('/login', async (req, res) => {
 
             const currentHour = currentTime.getHours();
             if (currentHour >= 6 && (!lastLoginDate || lastLoginDate.toDateString() !== currentTime.toDateString())) {
-                const [{ affectedRows }] = await db.query('UPDATE user_login SET login_count_month = ?, login_isfirst = 0 WHERE user_id = ?', [loginCountMonth + 1, userId]);
-                if (affectedRows > 0) {
-                    loginCountMonth += 1;
-                    loginIsFirst = true;
-                }
+                await db.query('UPDATE user_login SET login_isfirst = 0 WHERE user_id = ?', [userId]);
+                
             }
 
             const [userDetails] = await db.query('SELECT * FROM user_details WHERE user_id = ?', [userId]);
@@ -240,7 +237,9 @@ app.post('/updateUserGoods', async (req, res) => {
         }
 
         const [result] = await db.query(`UPDATE user_item_goods SET ${mysql.escapeId(column)} = ? WHERE user_id = ?`, [value, userId]);
-        await db.query('UPDATE user_login SET login_isfirst = 1 WHERE user_id = ?', [userId]);
+        
+        //첫 보상 관련 코드는 따로 짤 것.
+        await db.query('UPDATE user_login SET login_count_month = ?, login_isfirst = 1 WHERE user_id = ?', [userId]);
         
         await db.commit();
         logger.info('Updated Goods successfully');
@@ -254,6 +253,11 @@ app.post('/updateUserGoods', async (req, res) => {
             db.release(); // 연결 해제
         }
     }
+});
+
+app.post('/updateUserGoods', async (req, res) => {
+    const { userId, column, value } = req.body;
+
 });
 
 // 무기 데이터 로드
