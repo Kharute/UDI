@@ -103,7 +103,7 @@ app.post('/login', async (req, res) => {
 
             const currentHour = currentTime.getHours();
             if (currentHour >= 6 && (!lastLoginDate || lastLoginDate.toDateString() !== currentTime.toDateString())) {
-                [{ affectedRows }] = await db.query('UPDATE user_login SET login_count_month = ?, login_isfirst = 1 WHERE user_id = ?', [loginCountMonth + 1, userId]);
+                const [{ affectedRows }] = await db.query('UPDATE user_login SET login_count_month = ?, login_isfirst = 1 WHERE user_id = ?', [loginCountMonth + 1, userId]);
                 if (affectedRows > 0) {
                     loginCountMonth += 1;
                     loginIsFirst = true;
@@ -140,6 +140,10 @@ app.post('/login', async (req, res) => {
     } catch (error) {
         logger.error('Error in login route:', error);
         res.status(500).json({ success: false, message: 'Internal server error during login' });
+    } finally {
+        if (db) {
+            db.release(); // 연결 해제
+        }
     }
 });
 
@@ -171,6 +175,10 @@ app.post('/createUserDetails', async (req, res) => {
         await db.rollback();
         logger.error('Error in createUserDetails:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    } finally {
+        if (db) {
+            db.release(); // 연결 해제
+        }
     }
 });
 
@@ -197,6 +205,10 @@ app.post('/updateUserDetails', async (req, res) => {
     } catch (error) {
         logger.error('Error in updateUserDetails:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    } finally {
+        if (db) {
+            db.release(); // 연결 해제
+        }
     }
 });
 
@@ -224,6 +236,10 @@ app.post('/updateUserGoods', async (req, res) => {
     } catch (error) {
         logger.error('Error in updateUserGoods:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    } finally {
+        if (db) {
+            db.release(); // 연결 해제
+        }
     }
 });
 
@@ -239,6 +255,10 @@ app.post('/loadWeaponData', async (req, res) => {
     } catch (error) {
         logger.error('Error in loadWeaponData:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    } finally {
+        if (db) {
+            db.release(); // 연결 해제
+        }
     }
 });
 
@@ -266,6 +286,10 @@ app.post('/uploadWeaponData', async (req, res) => {
         await db.rollback();
         logger.error('Error in uploadWeaponData:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    } finally {
+        if (db) {
+            db.release(); // 연결 해제
+        }
     }
 });
 
@@ -299,6 +323,10 @@ app.post('/gacha', async (req, res) => {
         await db.rollback();
         logger.error('Error in gacha:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    } finally {
+        if (db) {
+            db.release(); // 연결 해제
+        }
     }
 });
 
