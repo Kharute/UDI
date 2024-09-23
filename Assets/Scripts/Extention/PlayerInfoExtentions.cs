@@ -15,12 +15,10 @@ public static class PlayerInfoExtentions
         vm.Level = userDetails.level;
         vm.Exp = userDetails.experience;
     }
-    public static void RegisterEventsOnEnable_PlayerInfo(this PlayerInfoViewModel vm, bool isEventEnable)
+    public static void OnResponseNameChangedEvent(this PlayerInfoViewModel vm, string name)
     {
-        DataBaseManager.Inst.RegisterExpUpCallback(vm.OnResponseExpChangedEvent, isEventEnable);
-        DataBaseManager.Inst.RegisterLevelUpCallback(vm.OnResponseLevelChangedEvent, isEventEnable);
+        vm.Name = name;
     }
-
     public static void OnResponseExpChangedEvent(this PlayerInfoViewModel vm, int exp)
     {
         vm.Exp = exp;
@@ -33,7 +31,7 @@ public static class PlayerInfoExtentions
 
     public static void RegisterEventsOnEnable(this PlayerInfoViewModel vm, bool isEventEnable)
     {
-        //DataBaseManager.Inst.RegisterNameChangeCallback(vm.OnResponseNameChangedEvent, isEventEnable);
+        DataBaseManager.Inst.RegisterLoginCallback(vm.OnResponseNameChangedEvent, isEventEnable);
         DataBaseManager.Inst.RegisterExpUpCallback(vm.OnResponseExpChangedEvent, isEventEnable);
         DataBaseManager.Inst.RegisterLevelUpCallback(vm.OnResponseLevelChangedEvent, isEventEnable);
     }
@@ -57,23 +55,23 @@ public static class PlayerInfoExtentions
 
     public static void RegisterEventsOnEnable_Goods(this GoodsViewModel vm, bool isEventEnable)
     {
-        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.GOLD, isEventEnable);
-        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.JEWEL, isEventEnable);
-        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.TICKET_WEAPON, isEventEnable);
-        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.TICKET_ARMOR, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.gold, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.jewel, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.ticket_weapon, isEventEnable);
+        DataBaseManager.Inst.Register_GoodsChangedCallback(vm.OnResponse_GoodsChangedEvent, UserGoodsType.ticket_armor, isEventEnable);
     }
 
     public static void OnResponse_GoodsChangedEvent(this GoodsViewModel vm, UserGoodsType type, int value)
     {
         switch(type)
         {
-            case UserGoodsType.GOLD: 
+            case UserGoodsType.gold: 
                 vm.Gold = value; break;
-            case UserGoodsType.JEWEL: 
+            case UserGoodsType.jewel: 
                 vm.Jewel = value; break;
-            case UserGoodsType.TICKET_WEAPON: 
+            case UserGoodsType.ticket_weapon: 
                 vm.Ticket_Weapon = value; break;
-            case UserGoodsType.TICKET_ARMOR: 
+            case UserGoodsType.ticket_armor: 
                 vm.Ticket_Armor = value; break;
         }
     }

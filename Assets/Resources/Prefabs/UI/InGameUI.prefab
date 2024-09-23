@@ -282,14 +282,13 @@ GameObject:
   - component: {fileID: 5692138874911189903}
   - component: {fileID: 5692138874911189902}
   - component: {fileID: 5692138874911189901}
-  - component: {fileID: 2695010899219491659}
   m_Layer: 5
   m_Name: InGameUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5692138874911189888
 RectTransform:
   m_ObjectHideFlags: 0
@@ -375,18 +374,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &2695010899219491659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5692138874911189900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beafa3a9e774d7a4b98b088ec7fb72e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5692138874916200300
 GameObject:
   m_ObjectHideFlags: 0
@@ -3685,7 +3672,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 782963176193060284, guid: 8dac7480189e2a5429d0c28f70d672a6, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 782963176670077573, guid: 8dac7480189e2a5429d0c28f70d672a6, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -3697,7 +3684,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 782963176851600532, guid: 8dac7480189e2a5429d0c28f70d672a6, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 782963176851600532, guid: 8dac7480189e2a5429d0c28f70d672a6, type: 3}
       propertyPath: m_AnchorMin.x

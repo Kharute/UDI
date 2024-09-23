@@ -5,39 +5,43 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using UnityEngine.Experimental.Rendering;
+using System.Resources;
+using System.Linq;
 
+public enum LoginCase
+{
+    Login,
+    Level,
+    Exp
+}
 public enum UserGoodsType
 {
-    GOLD,
-    JEWEL,
-    TICKET_WEAPON,
-    TICKET_ARMOR
+    gold,
+    jewel,
+    ticket_weapon,
+    ticket_armor
 }
 /// <summary>
 /// 외부 데이터를 Save/Load 하기 위한 Manager
 /// </summary>
 
-public class DataBaseManager : MonoBehaviour
+public class DataBaseManager
 {
-    [SerializeField] AppSettings appSettings;
+    AppSettings appSettings;
+    GameObject outGameView;
+    GameObject inGameView;
 
-    [SerializeField]
-    OutGameView outGameView;
+    private static DataBaseManager _instance;
 
-    [SerializeField]
-    InGameView inGameView;
-
-    private static DataBaseManager _instance = null;
-
-    private Action<int, int> _loginCallback;
-    private Action<UserDetails> _playerInfoCallback;
-    private Action<int> _levelUpCallback;
+    private Action<string> _loginCallback;
     private Action<int> _expUpCallback;
+    private Action<int> _levelUpCallback;
     private Action<UserGoodsType, int> _goodsChangedCallback;
 
     private UserDetails _userDetails = null;
     private UserGoods _userGoods = null;
-    private UserWeapon _userWeapon = null;
 
     private int _loginCountMonth;
     private bool _isFirstLogin;
@@ -48,6 +52,11 @@ public class DataBaseManager : MonoBehaviour
     private UserWeaponResponse weapon_feedback = new();
 
     public Dictionary<int, int> weapon_CountList;
+    public bool IsFirstLogin
+    {
+        get { return _isFirstLogin; }
+        set { _isFirstLogin = value; }
+    }
 
     public static DataBaseManager Inst
     {
@@ -55,15 +64,23 @@ public class DataBaseManager : MonoBehaviour
         {
             if (_instance == null)
             {
-                _instance = FindObjectOfType<DataBaseManager>();
+                _instance = new DataBaseManager();
             }
             return _instance;
         }
     }
+    private DataBaseManager()
+    {
+        LoadResources();
+    }
 
-    private void Awake()
+    void LoadResources()
     {
         _userGoods = new UserGoods();
+        appSettings = Resources.Load<AppSettings>("AppSettings/appsettings");
+        outGameView = Resources.Load<GameObject>("Prefabs/UI/OutGameUI");
+        inGameView = Resources.Load<GameObject>("Prefabs/UI/InGameUI");
+        Debug.Log("DB 리소스 로드 완료");
     }
 
     #region Getter
@@ -77,14 +94,11 @@ public class DataBaseManager : MonoBehaviour
         return _loginCountMonth;
     }
 
-    public bool IsFirstLogin()
-    {
-        return _isFirstLogin;
-    }
     #endregion
 
     #region MVVM Register / UnRegister CallBack
-    public void RegisterLoginCallback(Action<int, int> loginCallback, bool isLogin)
+
+    public void RegisterLoginCallback(Action<string> loginCallback, bool isLogin)
     {
         if (isLogin)
             _loginCallback += loginCallback;
@@ -115,8 +129,7 @@ public class DataBaseManager : MonoBehaviour
         else
             _goodsChangedCallback -= valueChangedCallback;
     }
-
-
+   
     #endregion
 
     #region MVVM Refresh / Request
@@ -137,14 +150,14 @@ public class DataBaseManager : MonoBehaviour
     }
 
     #region MVVM Details
-    public void RequestLevelUp()
+    public async Task RequestLevelUp()
     {
         _userDetails.level += 1;
-        StartCoroutine(UpdateUserDetails("level", _userDetails.level, _userDetails.user_id));
+        await UpdateUserDetails("level", _userDetails.level, _userDetails.user_id);
         _levelUpCallback?.Invoke(_userDetails.level);
     }
 
-    public void RequestExpGain(int exp)
+    public async Task RequestExpGain(int exp)
     {
         if (_userDetails.level < GameDataManager.Inst.LevelInfoList.Count)
         {
@@ -153,28 +166,23 @@ public class DataBaseManager : MonoBehaviour
             if (_userDetails.experience> _playerDetail.REQEXP)
             {
                 _userDetails.experience -= _playerDetail.REQEXP;
-                Inst.RequestLevelUp();
+                await Inst.RequestLevelUp();
             }
 
-            StartCoroutine(UpdateUserDetails("experience", _userDetails.level, _userDetails.user_id));
+            await UpdateUserDetails("experience", _userDetails.experience, _userDetails.user_id);
             _expUpCallback?.Invoke(_userDetails.experience);
         }
     }
 
     #endregion MVVM Details
-
     #endregion MVVM Refresh / Request
+
 
     #region Database Connection
 
     #region Login
 
-    public void RequestLogin(string username, string password)
-    {
-        StartCoroutine(Login(username, password));
-    }
-
-    IEnumerator Login(string username, string password)
+    public async Task Login(string username, string password)
     {
         string url = $"{appSettings.IPAddress}:{appSettings.Port}/login";
         WWWForm form = new WWWForm();
@@ -183,15 +191,18 @@ public class DataBaseManager : MonoBehaviour
 
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
-            yield return www.SendWebRequest();
-            /*Debug.Log($"www.result : {www.responseCode}");
-            Debug.Log($"www.result : {www.result}");*/
+            var operation = www.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield(); // 유니티의 메인 스레드를 블로킹하지 않도록 함.
+            }
+
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
                 login_feedback.message = "Error: " + www.error;
                 login_feedback.success = false;
-                Debug.Log("login error");
             }
+
             else
             {
                 LoginResponse loginResponse = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
@@ -204,15 +215,18 @@ public class DataBaseManager : MonoBehaviour
                     // Data Load
                     InitUserDetails(loginResponse.userDetails);
                     InitUserGoods(loginResponse.userGoods);
-                    RequestLoadWeaponData(loginResponse.userDetails.user_id);
+                    await LoadWeaponData(loginResponse.userDetails.user_id);
 
                     _loginCountMonth = loginResponse.loginCountMonth;
-                    _isFirstLogin = loginResponse.isFirstLogin;
-                    _loginCallback?.Invoke(loginResponse.userDetails.user_id, loginResponse.userDetails.level);
+                    _isFirstLogin = loginResponse.loginIsFirst;
+
+                    //MVVM Update
+                    /*_loginCallback?.Invoke(loginResponse.userDetails.nickname);
+                    _expUpCallback?.Invoke(loginResponse.userDetails.experience);
+                    _levelUpCallback?.Invoke(loginResponse.userDetails.level);*/
 
                     // Game Scene Change.
-                    outGameView.OnDisable_Login();
-                    inGameView.OnStart_GameUI();
+                    UIManager.Inst.GameStart();
                 }
                 else
                 {
@@ -225,7 +239,7 @@ public class DataBaseManager : MonoBehaviour
     #endregion Login
 
     #region UserDetails
-    IEnumerator UpdateUserDetails(string column, int value, int userId)
+    public async Task UpdateUserDetails(string column, int value, int userId)
     {   
         string url = $"{appSettings.IPAddress}:{appSettings.Port}/updateUserDetails";
 
@@ -234,34 +248,21 @@ public class DataBaseManager : MonoBehaviour
         form.AddField("column", column);
         form.AddField("value", value);
 
+
+        Debug.Log($"column : {column}, value : {value}, UserID : {userId}");
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
-            yield return www.SendWebRequest();
+            var operation = www.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield(); // 유니티의 메인 스레드를 블로킹하지 않도록 함.
+            }
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
                 login_feedback.message = "Error: " + www.error;
                 login_feedback.success = false;
             }
-            else
-            {
-                ProcessUserDetailsResponse(www.downloadHandler.text);
-            }
-        }
-    }
-
-    void ProcessUserDetailsResponse(string response)
-    {
-        UserDetailsResponse userDetailsResponse = JsonUtility.FromJson<UserDetailsResponse>(response);
-
-        if (userDetailsResponse.success)
-        {
-            login_feedback.message = "User details retrieved successfully!";
-            InitUserDetails(userDetailsResponse.userDetails);
-        }
-        else
-        {
-            login_feedback.message = "Failed to retrieve user details: " + userDetailsResponse.message;
         }
     }
 
@@ -274,29 +275,29 @@ public class DataBaseManager : MonoBehaviour
 
     #region UserGoods
 
-    public void RequestGoodsChange(UserGoodsType goodsType, int value)
+    public async Task RequestGoodsChange(UserGoodsType goodsType, int value)
     {
         switch (goodsType)
         {
-            case UserGoodsType.GOLD:
+            case UserGoodsType.gold:
                 value += _userGoods.gold;
                 break;
-            case UserGoodsType.JEWEL:
+            case UserGoodsType.jewel:
                 value += _userGoods.jewel;
                 break;
-            case UserGoodsType.TICKET_WEAPON:
+            case UserGoodsType.ticket_weapon:
                 value += _userGoods.ticket_weapon;
                 break;
-            case UserGoodsType.TICKET_ARMOR:
+            case UserGoodsType.ticket_armor:
                 value += _userGoods.ticket_armor;
                 break;
         }
 
-        StartCoroutine(UpdateUserGoods(goodsType, value, _userDetails.user_id));
+        await UpdateUserGoods(goodsType, value, _userDetails.user_id);
         _goodsChangedCallback?.Invoke(goodsType, value);
     }
 
-    IEnumerator UpdateUserGoods(UserGoodsType column, int value, int userId)
+    public async Task UpdateUserGoods(UserGoodsType column, int value, int userId)
     {
         string url = $"{appSettings.IPAddress}:{appSettings.Port}/updateUserGoods";
         WWWForm form = new WWWForm();
@@ -305,9 +306,14 @@ public class DataBaseManager : MonoBehaviour
         form.AddField("column", column.ToString()); //nameof 체크할 것.
         form.AddField("value", value);
 
+        Debug.Log($"column : {column}, value : {value}, UserID : {userId}");
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
-            yield return www.SendWebRequest();
+            var operation = www.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield(); // 유니티의 메인 스레드를 블로킹하지 않도록 함.
+            }
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
@@ -344,23 +350,21 @@ public class DataBaseManager : MonoBehaviour
     #endregion
 
     #region UserWeapon
-    public void RequestLoadWeaponData(int userId)
-    {
-        StartCoroutine(LoadWeaponData(userId));
-    }
 
-    IEnumerator LoadWeaponData(int userId)
+    async Task LoadWeaponData(int userId)
     {
         string url = $"{appSettings.IPAddress}:{appSettings.Port}/loadWeaponData";
-
         WWWForm form = new WWWForm();
 
         form.AddField("userId", userId);
 
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
-            yield return www.SendWebRequest();
-            Debug.Log($"www.result : {www.responseCode}");
+            var operation = www.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield(); // 유니티의 메인 스레드를 블로킹하지 않도록 함.
+            }
             Debug.Log($"www.result : {www.result}");
 
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
@@ -377,11 +381,6 @@ public class DataBaseManager : MonoBehaviour
         }
     }
 
-    void InitUserWeapon(UserWeapon userWeapon)
-    {
-        _userWeapon = userWeapon;
-    }
-
     void InitWeaponCount(UserWeaponResponse weapon_feedback)
     {
         if(weapon_CountList == null)
@@ -394,7 +393,7 @@ public class DataBaseManager : MonoBehaviour
         }
     }
 
-    public void BindWeapon()
+    public async Task BindWeapon()
     {
         bool isChanged = false;
         var weaponsToUpdate = new Dictionary<int, int>();
@@ -433,16 +432,11 @@ public class DataBaseManager : MonoBehaviour
 
         if (isChanged)
         {
-            UploadUserWeaponData();
+            await UploadWeaponData();
         }
     }
 
-    public void UploadUserWeaponData()
-    {
-        StartCoroutine(UploadWeaponData());
-    }
-
-    private IEnumerator UploadWeaponData()
+    private async Task UploadWeaponData()
     {
         string url = $"{appSettings.IPAddress}:{appSettings.Port}/uploadWeaponData";
 
@@ -470,7 +464,11 @@ public class DataBaseManager : MonoBehaviour
         www.downloadHandler = new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/json");
 
-        yield return www.SendWebRequest();
+        var operation = www.SendWebRequest();
+        while (!operation.isDone)
+        {
+            await Task.Yield(); // 유니티의 메인 스레드를 블로킹하지 않도록 함.
+        }
 
         if (www.result == UnityWebRequest.Result.Success)
         {
@@ -486,12 +484,12 @@ public class DataBaseManager : MonoBehaviour
 
     #region Gacha System
 
-    public void RequestGacha(int count, Action<Dictionary<int, int>> callback)
+    public async Task RequestGacha(int count, Action<Dictionary<int, int>> callback)
     {
-        StartCoroutine(RequestGachaCoroutine(_userDetails.user_id, count, callback));
+        await RequestGachaAsync(_userDetails.user_id, count, callback);
     }
     
-    private IEnumerator RequestGachaCoroutine(int userId, int count, Action<Dictionary<int, int>> callback)
+    private async Task RequestGachaAsync(int userId, int count, Action<Dictionary<int, int>> callback)
     {
         string url = $"{appSettings.IPAddress}:{appSettings.Port}/gacha";
 
@@ -501,7 +499,11 @@ public class DataBaseManager : MonoBehaviour
 
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
-            yield return www.SendWebRequest();
+            var operation = www.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield(); // 유니티의 메인 스레드를 블로킹하지 않도록 함.
+            }
 
             if (www.result != UnityWebRequest.Result.Success)
             {
@@ -509,10 +511,20 @@ public class DataBaseManager : MonoBehaviour
             }
             else
             {
-                string jsonResponse = www.downloadHandler.text;
-                Dictionary<int, int> response = JsonConvert.DeserializeObject<Dictionary<int, int>>(jsonResponse);
-                ProcessGachaResponse(response);
-                callback?.Invoke(response);
+                try
+                {
+                    string jsonResponse = www.downloadHandler.text;
+                    GachaResponse response = JsonConvert.DeserializeObject<GachaResponse>(jsonResponse);
+                    Dictionary<int, int> result = response.Result.ToDictionary(entry => int.Parse(entry.Key), entry => entry.Value);
+
+                    ProcessGachaResponse(result);
+                    callback?.Invoke(result);
+                }
+                catch(Exception e)
+                {
+                    Debug.LogError(e.Message);
+                }
+
             }
         }
     }
@@ -521,13 +533,14 @@ public class DataBaseManager : MonoBehaviour
     {
         foreach (var item in response)
         {
-            if (weapon_CountList.ContainsKey(item.Key))
+            int parseInt = item.Key;
+            if (weapon_CountList.ContainsKey(parseInt))
             {
-                weapon_CountList[item.Key] += item.Value;
+                weapon_CountList[parseInt] += item.Value;
             }
             else
             {
-                weapon_CountList[item.Key] = item.Value;
+                weapon_CountList[parseInt] = item.Value;
             }
         }
     }
@@ -535,81 +548,11 @@ public class DataBaseManager : MonoBehaviour
     #endregion
 
     #endregion Database Connection
-}
 
-[System.Serializable]
-public class LoginResponse
-{
-    public bool success;
-    public string message;
-    public UserDetails userDetails;
-    public UserGoods userGoods;
-    public UserWeapon userWeapon;
-    public int loginCountMonth;
-    public bool isFirstLogin; // Add this field to store isFirstLogin status
 }
-
-[System.Serializable]
-public class UserDetailsResponse
+public class GachaResponse
 {
-    public bool success;
-    public string message;
-    public UserDetails userDetails;
-}
-
-[System.Serializable]
-public class UserGoodsResponse
-{
-    public bool success;
-    public string message;
-    public UserGoods userGoods;
-}
-
-[System.Serializable]
-public class UserWeaponResponse
-{
-    public List<UserWeapon> userWeapon;
-}
-
-[System.Serializable]
-public class UserDetails
-{
-    public int user_id;
-    public string nickname;
-    public int level;
-    public int experience;
-    public int skill_point;
-    public string inventory;
-}
-
-[System.Serializable]
-public class UserGoods
-{
-    public int user_id;
-    public int gold;
-    public int jewel;
-    public int ticket_weapon;
-    public int ticket_armor;
-}
-
-[System.Serializable]
-public class UserWeapon
-{
-    public int weapon_id;
-    public int weapon_count;
-}
-
-[System.Serializable]
-public class WeaponRequest
-{
-    public int user_id;
-    public List<WeaponData> weapons;
-}
-
-[System.Serializable]
-public class WeaponData
-{
-    public int weapon_id;
-    public int weapon_count;
+    public bool Success { get; set; }
+    public Dictionary<string, int> Result { get; set; }
 }
 

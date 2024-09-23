@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -46,20 +47,7 @@ public class OutGameView : MonoBehaviour
         }
         else
         {
-            DataBaseManager.Inst.RequestLogin(username, password);
-        }
-    }
-
-    public void OnDisable_Login()
-    {
-        gameObject.SetActive(false);
-    }
-    //[todo]
-    IEnumerator Login_waitting()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.1f);
+            _ = DataBaseManager.Inst.Login(username, password);
         }
     }
 }

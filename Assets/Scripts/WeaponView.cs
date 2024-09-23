@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class WeaponView : MonoBehaviour
@@ -15,7 +16,6 @@ public class WeaponView : MonoBehaviour
     [SerializeField] GameObject Prefab_WeaponSlot;
     [SerializeField] GameObject Transform_SlotRoot;
 
-
     private void Start()
     {
         SetSkillUI();
@@ -28,6 +28,7 @@ public class WeaponView : MonoBehaviour
         if (isOpened)
         {
             gameObject.SetActive(true);
+            RefreshWeaponView();
         }
 
         StartCoroutine(SlideStateChange());
@@ -68,15 +69,19 @@ public class WeaponView : MonoBehaviour
 
     public void BindWeapon()
     {
-        DataBaseManager.Inst.BindWeapon();
+        _ = DataBaseManager.Inst.BindWeapon();
+        RefreshWeaponView();
+    }
 
+    void RefreshWeaponView()
+    {
         var objList = GameObject.FindGameObjectsWithTag("Skill");
-        
+
         var weaponItemList = GameDataManager.Inst.WeaponInfoList;
 
         foreach (var weapon in weaponItemList)
         {
-            var objsList = objList[weapon.Value.weapon_id -1].GetComponent<WeaponSlotView>();
+            var objsList = objList[weapon.Value.weapon_id - 1].GetComponent<WeaponSlotView>();
 
             objsList.SetUI(weapon.Value.weapon_id);
         }

@@ -1,9 +1,9 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class AttendView : MonoBehaviour
 {
     int login_count;
-    bool isAccept = false;
 
     public void OnClick_Attend(bool isOpen)
     {
@@ -12,7 +12,7 @@ public class AttendView : MonoBehaviour
 
     public void OnClick_AcceptAttend()
     {
-        if (!isAccept)
+        if (!DataBaseManager.Inst.IsFirstLogin)
         {
             login_count = DataBaseManager.Inst.GetLoginCountMonth();
             if (login_count > 0)
@@ -24,24 +24,24 @@ public class AttendView : MonoBehaviour
                 {
                     switch (attendItem.ClassName)
                     {
-                        case "GOLD":
-                            type = UserGoodsType.GOLD;
-                            DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
+                        case "gold":
+                            type = UserGoodsType.gold;
+                            _ = DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
                             break;
-                        case "JEWEL":
-                            type = UserGoodsType.JEWEL;
-                            DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
+                        case "jewel":
+                            type = UserGoodsType.jewel;
+                            _ = DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
                             break;
-                        case "TICKET_WEAPON":
-                            type = UserGoodsType.TICKET_WEAPON;
-                            DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
+                        case "ticket_weapon":
+                            type = UserGoodsType.ticket_weapon;
+                            _ = DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
                             break;
-                        case "TICKET_ARMOR":
-                            type = UserGoodsType.TICKET_ARMOR;
-                            DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
+                        case "ticket_armor":
+                            type = UserGoodsType.ticket_armor;
+                            _ = DataBaseManager.Inst.RequestGoodsChange(type, attendItem.Amount);
                             break;
                     }
-                    isAccept = !isAccept;
+                    DataBaseManager.Inst.IsFirstLogin = !DataBaseManager.Inst.IsFirstLogin;
                 }
             }
         }

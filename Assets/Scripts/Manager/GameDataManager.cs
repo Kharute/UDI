@@ -42,7 +42,7 @@ public class GameDataManager : MonoBehaviour
 
     private void Awake()
     {
-        _dataRootPath = Application.dataPath;
+        _dataRootPath = "XML_Folder";
         ReadAllDataOnAwake();
     }
 
@@ -87,7 +87,7 @@ public class GameDataManager : MonoBehaviour
     {
         LevelInfoList = new Dictionary<int, Levels>();
 
-        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        XDocument doc = LoadXMLFromResources($"{_dataRootPath}/{tableName}");
         var dataElements = doc.Descendants("data");
 
         foreach (var data in dataElements)
@@ -109,7 +109,7 @@ public class GameDataManager : MonoBehaviour
         //ItemInfoList = new Dictionary<string, Item>();
         GoodsItemInfoList = new Dictionary<string, Goods>();
 
-        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        XDocument doc = LoadXMLFromResources($"{_dataRootPath}/{tableName}");
         var dataElements = doc.Descendants("data");
 
         foreach (var data in dataElements)
@@ -154,7 +154,7 @@ public class GameDataManager : MonoBehaviour
     {
         AttendItemInfoList = new Dictionary<int, AttendItem>();
 
-        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        XDocument doc = LoadXMLFromResources($"{_dataRootPath}/{tableName}");
         var dataElements = doc.Descendants("data");
 
         foreach (var data in dataElements)
@@ -172,7 +172,7 @@ public class GameDataManager : MonoBehaviour
     {
         SkillInfoList = new Dictionary<string, Skill>();
 
-        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        XDocument doc = LoadXMLFromResources($"{_dataRootPath}/{tableName}");
         var dataElements = doc.Descendants("data");
 
         foreach (var data in dataElements)
@@ -196,7 +196,7 @@ public class GameDataManager : MonoBehaviour
     {
         SkillTreeList = new Dictionary<int, SkillTreeSlot>();
 
-        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        XDocument doc = LoadXMLFromResources($"{_dataRootPath}/{tableName}");
         var dataElements = doc.Descendants("data");
 
         foreach (var data in dataElements)
@@ -223,7 +223,7 @@ public class GameDataManager : MonoBehaviour
     {
         WeaponInfoList = new Dictionary<int, WeaponInfo>();
 
-        XDocument doc = XDocument.Load($"{_dataRootPath}/{tableName}.xml");
+        XDocument doc = LoadXMLFromResources($"{_dataRootPath}/{tableName}");
         var dataElements = doc.Descendants("data");
 
         foreach (var data in dataElements)
@@ -240,4 +240,19 @@ public class GameDataManager : MonoBehaviour
     }
     #endregion
 
+    public XDocument LoadXMLFromResources(string tableName)
+    {
+        // Resources 폴더에서 XML 파일을 불러옴
+        TextAsset xmlFile = Resources.Load<TextAsset>(tableName);
+
+        if (xmlFile == null)
+        {
+            Debug.LogError($"Failed to load {tableName}.xml from Resources.");
+            return null;
+        }
+        //+ ".xml"
+        // XML 텍스트를 XDocument로 변환
+        XDocument doc = XDocument.Parse(xmlFile.text);
+        return doc;
+    }
 }

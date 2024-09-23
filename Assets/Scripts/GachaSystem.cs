@@ -1,18 +1,23 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
 public class GachaSystem : MonoBehaviour
 {
     public TextMeshProUGUI resultText;
-    public void OnGacha10ButtonPressed()
-    {
-        DataBaseManager.Inst.RequestGacha(10, DisplayGachaResult);
-    }
 
-    public void OnGacha100ButtonPressed()
+    public void OnGachaButtonPressed(bool is100)
     {
-        DataBaseManager.Inst.RequestGacha(100, DisplayGachaResult);
+        //t = 10, f = 100
+        if(is100)
+        {
+            _ = DataBaseManager.Inst.RequestGacha(10, DisplayGachaResult);
+        }
+        else
+        {
+            _ = DataBaseManager.Inst.RequestGacha(100, DisplayGachaResult);
+        }
     }
 
     private void DisplayGachaResult(Dictionary<int, int> response)

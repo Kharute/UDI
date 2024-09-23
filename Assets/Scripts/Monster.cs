@@ -109,7 +109,7 @@ public class Monster : MonoBehaviour
         {
             gameObject.transform.localPosition = Vector3.zero;
             gameObject.SetActive(false);
-            DataBaseManager.Inst.RequestExpGain(3);
+            _ = DataBaseManager.Inst.RequestExpGain(3);
             HP = MaxHP;
         }
     }
